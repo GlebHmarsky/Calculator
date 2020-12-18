@@ -5,7 +5,7 @@ protected:
 	char op; //Хранит сам оператор
 	double number; //Хранит некоторое число в выражении
 public:
-	BOOL isNum; //Отвечает как показатель, какой это элемент, число(1) или оператор(0)
+	bool isNum; //Отвечает как показатель, какой это элемент, число(1) или оператор(0)
 	class ExpOp* next, *prev;
 public:
 	ExpOp(char Cop) {
@@ -25,8 +25,8 @@ public:
 	ExpOp(ExpOp *El) {
 		number = El->number;
 		isNum = El->isNum;
-		next = El->next;
-		prev = El->prev;
+		next = NULL;
+		prev = NULL;
 		op = El->op;
 	}
 	char ExpOp::GetOp() {

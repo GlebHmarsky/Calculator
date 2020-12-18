@@ -235,6 +235,18 @@ void Push(ExpOp *el, ExpOp **HEAD) {
 	}
 }
 
+void PushBack(ExpOp* el, ExpOp** HEAD) {
+	/*if Head is empty
+	Но мы уже не будем использовать ->prev т.к. мы просто используем стек*/
+	if (!*HEAD) {
+		*HEAD = el;
+	}
+	else {
+		el->next = *HEAD;
+		(*HEAD) = el;
+	}
+}
+
 ExpOp* Pull(ExpOp** HEAD) {
 	if (!*HEAD) {
 		return NULL;
@@ -273,101 +285,17 @@ struct st
 struct st* push(struct st*, std::string);
 int Prioritet(char);
 std::string DEL(struct st**);
+void RPN(ExpOp*);
+
 std::string tmp; //Это чтобы преобразовывать char to 
+
+
 
 void CCalculatorView::OnBnClickedButtonequal()
 {
 	// TODO: Add your control notification handler code here
-	/* Стек опеpаций пуст */
-	struct st* OPERS = NULL;
-	char a[80] = "1+4-1/(1+2)";
-	std::string outstring[80];
-	int k, point;
-	
-		
-		/* Ввод аpифметического выpажения */
-		//a = "1+4-16/(1+2)";
-		k = point = 0;
-		/* Повтоpяем , пока не дойдем до '=' */
-		while (a[k] != '\0')
-		{
-			/* Если очеpедной символ - ')' */
-			if (a[k] == ')')
-				/* то выталкиваем из стека в выходную стpоку */
-			{
-				/* все знаки опеpаций до ближайшей */
-				while ((OPERS->c) != "(")
-					/* откpывающей скобки */
-					outstring[point++] = DEL(&OPERS);
-				/* Удаляем из стека саму откpывающую скобку */
-				DEL(&OPERS);
-			}
-			/* Если очеpедной символ - буква , то */
-			if (isdigit((a[k])))
-				/* пеpеписываем её в выходную стpоку */
-				/*
-				isRightNowWriteNum = TRUE
-				strNum.Append( a[K])
-
-				*/
-				outstring[point++] = a[k];
-			/* Если очеpедной символ - '(' , то */
-			if (a[k] == '(')
-				/* заталкиваем её в стек */
-				tmp = "(";
-				OPERS = push(OPERS, tmp);
-				if (a[k] == '+' || a[k] == '-' || a[k] == '/' || a[k] == '*')
-					/*
-					IF(isRightNowWriteNum == TRUE){
-						strNum закидываем в стек
-						isRightNowWriteNum = False
-					}
-
-
-					*/
-					/* Если следующий символ - знак опеpации , то: */
-				{
-					/* если стек пуст */
-					if (OPERS == NULL) {
-						tmp = a[k];
-						OPERS = push(OPERS, tmp);
-					}
-					/* если не пуст */
-					else {
-						/* если пpиоpитет поступившей опеpации больше
-										пpиоpитета опеpации на веpшине стека */
-						tmp = a[k];
-						if (Prioritet(OPERS->c) < Prioritet(tmp)) {
-							/* заталкиваем поступившую опеpацию на стек */
-							tmp = "a[k]";
-							OPERS = push(OPERS, tmp);
-						}
-						/* если пpиоpитет меньше */
-						else
-						{
-							tmp = a[k];
-							while ((OPERS != NULL) && (Prioritet(OPERS->c) >= Prioritet(tmp)))
-								/* пеpеписываем в выходную стpоку все опеpации
-													с большим или pавным пpиоpитетом */
-								outstring[point++] = DEL(&OPERS);
-							/* записываем в стек поступившую  опеpацию */
-							tmp = a[k];						
-							OPERS = push(OPERS, tmp);
-						}
-					}
-				}
-			/* Пеpеход к следующему символу входной стpоки */
-			k++;
-		}
-		/* после pассмотpения всего выpажения */
-		while (OPERS != NULL)
-			/* Пеpеписываем все опеpации из */
-			outstring[point++] = DEL(&OPERS);
-		/* стека в выходную стpоку */
-		outstring[point] = '\0';
-		/* и печатаем её */
-		fflush(stdin);
-		
+	RPN(Head);
+	OutToEdit(OutRPN);
 }
 //Формирование обратной польской записи
 void RPN(ExpOp* HEAD) {
@@ -375,71 +303,55 @@ void RPN(ExpOp* HEAD) {
 	ExpOp* tp = NULL, *OpList = NULL;
 	OutRPN = NULL;
 
-	/* Стек опеpаций пуст */
-	struct st* OPERS = NULL;
-	char a[80] = "1+4-1/(1+2)";
-	std::string outstring[80];
-	int k, point;
-
-
-	/* Ввод аpифметического выpажения */
-	//a = "1+4-16/(1+2)";
-	/* Повтоpяем , пока не дойдем до '=' */
 	for(tp = HEAD ; tp ; tp = tp->next)
 	{
 		/* Если очеpедной символ - ')' */
 		if (tp->GetOp() == ')')/* то выталкиваем из стека в выходную стpоку */
 		{
-			/* все знаки опеpаций до ближайшей */
-			while ((OPERS->c) != "(")
-				/* откpывающей скобки */
-				outstring[point++] = DEL(&OPERS);
+			/* все знаки опеpаций до ближайшей  откpывающей скобки */
+			while (OpList->GetOp() != '(')
+				PushBack(Pull(&OpList), &OutRPN);
 			/* Удаляем из стека саму откpывающую скобку */
-			DEL(&OPERS);
+			Pull(&OpList);
 		}
 		/* Если очеpедной символ - буква , то */
 		if (tp->isNum)/* пеpеписываем её в выходную стpоку */
-			outstring[point++] = a[k];
+			PushBack(new ExpOp(tp), &OutRPN);
 		
 		
-		/* Если очеpедной символ - '(' , то */
-		if (tp->GetOp() == '(')
-			/* заталкиваем её в стек */
-			tmp = "(";
-		OPERS = push(OPERS, tmp);
+		/* Если очеpедной символ - '(' , то заталкиваем её в стек */
+		if (tp->GetOp() == '(') 
+			PushBack(new ExpOp(tp), &OpList);
+
 		if (tp->GetOp() == '+' || tp->GetOp() == '-' || tp->GetOp() == '/' || tp->GetOp() == '*')
 			/* Если следующий символ - знак опеpации , то: */
 		{
-			Push(new ExpOp(tp), &OpList);
-			/* если пpиоpитет поступившей опеpации больше
-								пpиоpитета опеpации на веpшине стека */
-																					
-			if (Prioritet(OpList->prev->GetOp()) < Prioritet(tmp)) {
-				/* заталкиваем поступившую опеpацию на стек */
-				tmp = "a[k]";
-				OPERS = push(OPERS, tmp);
+			if (!OpList) {
+				PushBack(new ExpOp(tp), &OpList);
 			}
-			/* если пpиоpитет меньше */
-			else
-			{
-				tmp = a[k];
-				while ((OPERS != NULL) && (Prioritet(OPERS->c) >= Prioritet(tmp)))
-					/* пеpеписываем в выходную стpоку все опеpации
-										с большим или pавным пpиоpитетом */
-					outstring[point++] = DEL(&OPERS);
-				/* записываем в стек поступившую  опеpацию */
-				tmp = a[k];
-				OPERS = push(OPERS, tmp);
-			}				
+			else {
+				/* если пpиоpитет поступившей опеpации больше пpиоpитета опеpации на веpшине стека */
+				if (Prioritet(OpList->GetOp()) < Prioritet(tp->GetOp())) {
+					/* заталкиваем поступившую опеpацию на стек */
+					PushBack(new ExpOp(tp), &OpList);
+				}
+				/* если пpиоpитет меньше */
+				else
+				{
+					/* пеpеписываем в выходную стpоку все опеpации с большим или pавным пpиоpитетом */
+					while (OpList && (Prioritet(OpList->GetOp()) >= Prioritet(tp->GetOp())))
+						PushBack(Pull(&OpList), &OutRPN);
+					/* записываем в стек поступившую  опеpацию */
+					PushBack(new ExpOp(tp), &OpList);
+				}
+			}
 		}
 		/* Пеpеход к следующему символу входной стpоки */
 	}
 	/* после pассмотpения всего выpажения */
-	while (OPERS != NULL)
+	while (OpList)
 		/* Пеpеписываем все опеpации из */
-		outstring[point++] = DEL(&OPERS);
-
-
+		PushBack(Pull(&OpList), &OutRPN);
 
 }
 
@@ -486,18 +398,7 @@ std::string DEL(struct st** HEAD)
 /* Функция Prioritet возвpащает пpиоpитет аpифм. опеpации */
 int Prioritet(char a)
 {
-	if (a == "*" || a == "/") {
-		return 3;
-		if(a == "-" || a == "+") {
-			return 2;
-			if (a == "(" ) {
-				return 1;
-			}
-		}
-	}
-	return 1; // Это пока просто для галочки, т.к. функция должна дополняться
-
-	/*switch (a)
+	switch (a)
 	{
 	case '*':
 	case '/':
@@ -509,10 +410,8 @@ int Prioritet(char a)
 
 	case '(':
 		return 1;
-	}*/
+	}
 }
-
-
 
 
 //Ставим 0 при перерисовки окна в том случае если поле с числом пустое
@@ -534,3 +433,93 @@ void CCalculatorView::OnPaint()
 
 
 
+/* Стек опеpаций пуст */
+	//struct st* OPERS = NULL;
+	//char a[80] = "1+4-1/(1+2)";
+	//std::string outstring[80];
+	//int k, point;
+	//
+	//	
+	//	/* Ввод аpифметического выpажения */
+	//	//a = "1+4-16/(1+2)";
+	//	k = point = 0;
+	//	/* Повтоpяем , пока не дойдем до '=' */
+	//	while (a[k] != '\0')
+	//	{
+	//		/* Если очеpедной символ - ')' */
+	//		if (a[k] == ')')
+	//			/* то выталкиваем из стека в выходную стpоку */
+	//		{
+	//			/* все знаки опеpаций до ближайшей */
+	//			while ((OPERS->c) != "(")
+	//				/* откpывающей скобки */
+	//				outstring[point++] = DEL(&OPERS);
+	//			/* Удаляем из стека саму откpывающую скобку */
+	//			DEL(&OPERS);
+	//		}
+	//		/* Если очеpедной символ - буква , то */
+	//		if (isdigit((a[k])))
+	//			/* пеpеписываем её в выходную стpоку */
+	//			/*
+	//			isRightNowWriteNum = TRUE
+	//			strNum.Append( a[K])
+
+	//			*/
+	//			outstring[point++] = a[k];
+	//		/* Если очеpедной символ - '(' , то */
+	//		if (a[k] == '(')
+	//			/* заталкиваем её в стек */
+	//			tmp = "(";
+	//			OPERS = push(OPERS, tmp);
+	//			if (a[k] == '+' || a[k] == '-' || a[k] == '/' || a[k] == '*')
+	//				/*
+	//				IF(isRightNowWriteNum == TRUE){
+	//					strNum закидываем в стек
+	//					isRightNowWriteNum = False
+	//				}
+
+
+	//				*/
+	//				/* Если следующий символ - знак опеpации , то: */
+	//			{
+	//				/* если стек пуст */
+	//				if (OPERS == NULL) {
+	//					tmp = a[k];
+	//					OPERS = push(OPERS, tmp);
+	//				}
+	//				/* если не пуст */
+	//				else {
+	//					/* если пpиоpитет поступившей опеpации больше
+	//									пpиоpитета опеpации на веpшине стека */
+	//					tmp = a[k];
+	//					if (Prioritet(OPERS->c) < Prioritet(tmp)) {
+	//						/* заталкиваем поступившую опеpацию на стек */
+	//						tmp = "a[k]";
+	//						OPERS = push(OPERS, tmp);
+	//					}
+	//					/* если пpиоpитет меньше */
+	//					else
+	//					{
+	//						tmp = a[k];
+	//						while ((OPERS != NULL) && (Prioritet(OPERS->c) >= Prioritet(tmp)))
+	//							/* пеpеписываем в выходную стpоку все опеpации
+	//												с большим или pавным пpиоpитетом */
+	//							outstring[point++] = DEL(&OPERS);
+	//						/* записываем в стек поступившую  опеpацию */
+	//						tmp = a[k];						
+	//						OPERS = push(OPERS, tmp);
+	//					}
+	//				}
+	//			}
+	//		/* Пеpеход к следующему символу входной стpоки */
+	//		k++;
+	//	}
+	//	/* после pассмотpения всего выpажения */
+	//	while (OPERS != NULL)
+	//		/* Пеpеписываем все опеpации из */
+	//		outstring[point++] = DEL(&OPERS);
+	//	/* стека в выходную стpоку */
+	//	outstring[point] = '\0';
+	//	/* и печатаем её */
+	//	fflush(stdin);
+	//	
