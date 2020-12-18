@@ -46,8 +46,9 @@ protected:
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OutToEdit(ExpOp*);
-	afx_msg void AddToNumField(LPCSTR);
+	void OutToEdit(ExpOp*);
+	void AddToNumField(LPCSTR);
+	void AddToExpression(char);
 	CEdit m_EditBox;
 	CEdit m_NumField;
 	afx_msg void OnBnClickedButton1();
@@ -65,6 +66,9 @@ public:
 	afx_msg void OnBnClickedButtoncomma();
 	afx_msg void OnBnClickedButtonplus();
 	afx_msg void OnBnClickedButtonequal();
+	afx_msg void OnBnClickedButtonminus();
+	afx_msg void OnBnClickedButtondiff();
+	afx_msg void OnBnClickedButtonmult();
 };
 
 #ifndef _DEBUG  // debug version in CalculatorView.cpp

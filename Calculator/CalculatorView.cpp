@@ -44,6 +44,9 @@ BEGIN_MESSAGE_MAP(CCalculatorView, CFormView)
 	ON_BN_CLICKED(IDC_BUTTONCOMMA, &CCalculatorView::OnBnClickedButtoncomma)
 	ON_BN_CLICKED(IDC_BUTTONPLUS, &CCalculatorView::OnBnClickedButtonplus)
 	ON_BN_CLICKED(IDC_BUTTONEQUAL, &CCalculatorView::OnBnClickedButtonequal)
+	ON_BN_CLICKED(IDC_BUTTONMINUS, &CCalculatorView::OnBnClickedButtonminus)
+	ON_BN_CLICKED(IDC_BUTTONDIFF, &CCalculatorView::OnBnClickedButtondiff)
+	ON_BN_CLICKED(IDC_BUTTONMULT, &CCalculatorView::OnBnClickedButtonmult)
 END_MESSAGE_MAP()
 
 // CCalculatorView construction/destruction
@@ -106,9 +109,17 @@ CCalculatorDoc* CCalculatorView::GetDocument() const // non-debug version is inl
 
 // CCalculatorView message handlers
 
+
+int Prioritet(char);
+void RPN(ExpOp*);
+void Push(ExpOp*, ExpOp**);
+
 ExpOp* Head = NULL;
 ExpOp* OutRPN = NULL;
-bool CommaIsStands = FALSE;
+bool CommaIsStands = false; //Отвечает за то, что точка в числе уже стоит. 
+bool isNumberEmpty = true; //Отвечает за то, что число ещё не было написано (используется старое значение)
+bool isOperatorStand = false; //Отвечает за то, что поставлен бинарный оператор (который в случае нужно заменить)
+
 
 void CCalculatorView::OnBnClickedButton1()
 {
@@ -176,33 +187,47 @@ void CCalculatorView::OnBnClickedButton9()
 void CCalculatorView::OnBnClickedButton0()
 {
 	// TODO: Add your control notification handler code here
-	m_NumField.GetWindowText(str);
-	if (str != L"0") {
-		m_NumField.SetWindowTextW(str + "0");
+	if (isNumberEmpty) {
+		m_NumField.SetWindowTextW(L"0");
+		isNumberEmpty = false;
 	}
+	else 
+		if (str != L"0") {
+			m_NumField.GetWindowText(str);
+			m_NumField.SetWindowTextW(str + "0");
+		}
+	isOperatorStand = false;
 }
 
 void CCalculatorView::OnBnClickedButtoncomma()
 {
 	// TODO: Add your control notification handler code here
-	if (!CommaIsStands) {
-		m_NumField.GetWindowText(str);
-		m_NumField.SetWindowTextW(str + '.');
-		CommaIsStands = TRUE;
+	m_NumField.GetWindowText(str);
+	if (!CommaIsStands && isNumberEmpty) {
+		m_NumField.SetWindowTextW(L"0.");
+		CommaIsStands = true;
+		isNumberEmpty = false;
 	}
+	if (!CommaIsStands) {
+		m_NumField.SetWindowTextW(str + '.');
+		CommaIsStands = true;
+	}
+	isOperatorStand = false;
 }
 
 //Добавление цифры к строке числа
 void CCalculatorView::AddToNumField(LPCSTR num) {
 	m_NumField.GetWindowText(str);
-	if (str == L"0") {
+	if (str == L"0" || isNumberEmpty) {
 		m_NumField.SetWindowTextW(((LPCTSTR)num));
+		isNumberEmpty = false;
 	}
 	else {
 		m_NumField.SetWindowTextW(str + num);
 	}
+	isOperatorStand = false;
 }
-void Push(ExpOp*, ExpOp**);
+
 /*
 ОМЕГА ЛУЛ ЗНАНИЯ!!!
 
@@ -214,11 +239,49 @@ double d = atof(thestring).
 void CCalculatorView::OnBnClickedButtonplus()
 {
 	// TODO: Add your control notification handler code here
-	m_NumField.GetWindowText(str);
-	Push(new ExpOp(_tstof(str)), &Head);
-	Push(new ExpOp('+'), &Head);
-	OutToEdit(Head);
+	AddToExpression('+');
 }
+
+void CCalculatorView::OnBnClickedButtonminus()
+{
+	// TODO: Add your control notification handler code here
+	AddToExpression('-');
+}
+
+void CCalculatorView::OnBnClickedButtondiff()
+{
+	// TODO: Add your control notification handler code here
+	AddToExpression('/');
+}
+
+void CCalculatorView::OnBnClickedButtonmult()
+{
+	// TODO: Add your control notification handler code here
+	AddToExpression('*');
+}
+
+
+void CCalculatorView::AddToExpression(char op)
+{
+	m_NumField.GetWindowText(str);
+	if (!isOperatorStand) {
+		Push(new ExpOp(_tstof(str)), &Head);
+		Push(new ExpOp(op), &Head);
+		OutToEdit(Head);
+		isNumberEmpty = true;
+		isOperatorStand = true;
+	}
+	else
+	{
+		/*
+		* Удалить последний эл в Head
+		* Добавить новый
+		* А может просто достать последний и поменять его??????????
+		* Есть же SetOp! 
+		*/
+	}
+}
+
 
 /*-------------------------------------------------------------------------------*/
 
@@ -232,6 +295,19 @@ void Push(ExpOp *el, ExpOp **HEAD) {
 		el->prev = (*HEAD)->prev;
 		(*HEAD)->prev->next = el;
 		(*HEAD)->prev = el;
+	}
+}
+
+void PushToHead(ExpOp* el, ExpOp** HEAD) {
+	if (!*HEAD) {
+		*HEAD = el;
+		(*HEAD)->prev = *HEAD;
+	}
+	else {
+		el->prev = (*HEAD)->prev;
+		el->next = *HEAD;
+		(*HEAD)->prev = el;
+		(*HEAD) = el;		
 	}
 }
 
@@ -265,7 +341,7 @@ void CCalculatorView::OutToEdit(ExpOp* HEAD) {
 	{
 		
 		if (tp->isNum) {
-			tmp.Format(L"%f", tp->GetNum());
+			tmp.Format(L"%g", tp->GetNum());
 			str.Append(tmp);
 		}
 		else{
@@ -277,26 +353,19 @@ void CCalculatorView::OutToEdit(ExpOp* HEAD) {
 }
 /*-------------------------------------------------------------------------------*/
 
-/* Описание стpуктуpы(элемента стека) */
-struct st
-{
-	std::string c; struct st* next;
-};
-struct st* push(struct st*, std::string);
-int Prioritet(char);
-std::string DEL(struct st**);
-void RPN(ExpOp*);
-
-std::string tmp; //Это чтобы преобразовывать char to 
-
 
 
 void CCalculatorView::OnBnClickedButtonequal()
 {
 	// TODO: Add your control notification handler code here
+	/*Добавить последние число в стек и жить поживать*/
+	m_NumField.GetWindowText(str);
+	Push(new ExpOp(_tstof(str)), &Head);
+
 	RPN(Head);
 	OutToEdit(OutRPN);
 }
+
 //Формирование обратной польской записи
 void RPN(ExpOp* HEAD) {
 	
@@ -355,49 +424,13 @@ void RPN(ExpOp* HEAD) {
 
 }
 
-/* Функция push записывает на стек (на веpшину котоpого указывает HEAD)
-	   символ a . Возвpащает указатель на новую веpшину стека */
-struct st* push(struct st* HEAD, std::string a)
-{
-	struct st* PTR;
-	/* Выделение памяти */
-	if (!(PTR = (st*)malloc(sizeof(struct st))))
-	{
-		/* Если её нет - выход */
-		puts("нет памяти"); exit(-1);
-	}
-	/* Инициализация созданной веpшины */
-	
-	PTR->c = std::string(a);
-	/* и подключение её к стеку */
-	PTR->next = HEAD;
-	/* PTR -новая веpшина стека */
-	return PTR;
-}
+double CalculateRPN(ExpOp* RPN) {
 
-/* Функция DEL удаляет символ с веpшины стека.
-   Возвpащает удаляемый символ.
-   Изменяет указатель на веpшину стека */
-std::string DEL(struct st** HEAD)
-{
-	struct st* PTR;
-	std::string a;
-	/* Если стек пуст,  возвpащается '\0' */
-	if (*HEAD == NULL) return '\0';
-	/* в PTR - адpес веpшины стека */
-	PTR = *HEAD;
-	a = PTR->c;
-	/* Изменяем адpес веpшины стека */
-	*HEAD = PTR->next;
-	/* Освобождение памяти */
-	free(PTR);
-	/* Возвpат символа с веpшины стека */
-	return a;
-}
 
+
+}
 /* Функция Prioritet возвpащает пpиоpитет аpифм. опеpации */
-int Prioritet(char a)
-{
+int Prioritet(char a){
 	switch (a)
 	{
 	case '*':
@@ -411,6 +444,7 @@ int Prioritet(char a)
 	case '(':
 		return 1;
 	}
+	return 1;
 }
 
 
@@ -429,7 +463,57 @@ void CCalculatorView::OnPaint()
 
 
 
+/* Функция push записывает на стек (на веpшину котоpого указывает HEAD)
+	   символ a . Возвpащает указатель на новую веpшину стека */
+	   //struct st* push(struct st* HEAD, std::string a)
+	   //{
+	   //	struct st* PTR;
+	   //	/* Выделение памяти */
+	   //	if (!(PTR = (st*)malloc(sizeof(struct st))))
+	   //	{
+	   //		/* Если её нет - выход */
+	   //		puts("нет памяти"); exit(-1);
+	   //	}
+	   //	/* Инициализация созданной веpшины */
+	   //	
+	   //	PTR->c = std::string(a);
+	   //	/* и подключение её к стеку */
+	   //	PTR->next = HEAD;
+	   //	/* PTR -новая веpшина стека */
+	   //	return PTR;
+	   //}
+	   //
+	   ///* Функция DEL удаляет символ с веpшины стека.
+	   //   Возвpащает удаляемый символ.
+	   //   Изменяет указатель на веpшину стека */
+	   //std::string DEL(struct st** HEAD)
+	   //{
+	   //	struct st* PTR;
+	   //	std::string a;
+	   //	/* Если стек пуст,  возвpащается '\0' */
+	   //	if (*HEAD == NULL) return '\0';
+	   //	/* в PTR - адpес веpшины стека */
+	   //	PTR = *HEAD;
+	   //	a = PTR->c;
+	   //	/* Изменяем адpес веpшины стека */
+	   //	*HEAD = PTR->next;
+	   //	/* Освобождение памяти */
+	   //	free(PTR);
+	   //	/* Возвpат символа с веpшины стека */
+	   //	return a;
+	   //}
 
+/* Описание стpуктуpы(элемента стека) */
+//struct st
+//{
+//	std::string c; struct st* next;
+//};
+//struct st* push(struct st*, std::string);
+
+//std::string DEL(struct st**);
+
+//
+//std::string tmp; //Это чтобы преобразовывать char to 
 
 
 
@@ -523,3 +607,4 @@ void CCalculatorView::OnPaint()
 	//	/* и печатаем её */
 	//	fflush(stdin);
 	//	
+
