@@ -22,7 +22,7 @@
 #include <string>
 #include <iostream>
 #include "ExpOp.h"
-
+#include "MemoryItem.h"
 
 // CCalculatorView
 
@@ -49,6 +49,11 @@ BEGIN_MESSAGE_MAP(CCalculatorView, CFormView)
 	ON_BN_CLICKED(IDC_BUTTONMULT, &CCalculatorView::OnBnClickedButtonmult)
 	ON_BN_CLICKED(IDC_BUTTONOPENINGPAR, &CCalculatorView::OnBnClickedButtonopeningpar)
 	ON_BN_CLICKED(IDC_BUTTONCLOSINGPAR, &CCalculatorView::OnBnClickedButtonclosingpar)
+	ON_BN_CLICKED(IDC_BUTTONMC, &CCalculatorView::OnBnClickedButtonmc)
+	ON_BN_CLICKED(IDC_BUTTONMR, &CCalculatorView::OnBnClickedButtonmr)
+	ON_BN_CLICKED(IDC_BUTTONMS, &CCalculatorView::OnBnClickedButtonms)
+	ON_BN_CLICKED(IDC_BUTTONMPLUS, &CCalculatorView::OnBnClickedButtonmplus)
+	ON_BN_CLICKED(IDC_BUTTONMMINUS, &CCalculatorView::OnBnClickedButtonmminus)
 END_MESSAGE_MAP()
 
 // CCalculatorView construction/destruction
@@ -119,6 +124,7 @@ double CalculateRPN(ExpOp**);
 
 ExpOp* Head = NULL;
 ExpOp* OutRPN = NULL;
+MemoryItem* mi = new MemoryItem();
 int countBreckets = 0;
 bool isOpenBrStand = false;
 bool isCloseBrLast = false;
@@ -389,6 +395,41 @@ void CCalculatorView::OutToEdit(double Result) {
 }
 /*-------------------------------------------------------------------------------*/
 
+void CCalculatorView::OnBnClickedButtonmc()
+{
+	// TODO: Add your control notification handler code here
+	mi->Mclear();
+}
+
+void CCalculatorView::OnBnClickedButtonmr()
+{
+	// TODO: Add your control notification handler code here
+	CString tmp;
+	tmp.Format(L"%g", mi->Mread());
+	m_NumField.SetWindowTextW(tmp);
+	isNumberEmpty = true;
+}
+
+void CCalculatorView::OnBnClickedButtonms()
+{
+	// TODO: Add your control notification handler code here
+	m_NumField.GetWindowText(str);
+	mi->Msave(_tstof(str));
+}
+
+void CCalculatorView::OnBnClickedButtonmplus()
+{
+	// TODO: Add your control notification handler code here
+	m_NumField.GetWindowText(str);
+	mi->Mplus(_tstof(str));
+}
+
+void CCalculatorView::OnBnClickedButtonmminus()
+{
+	// TODO: Add your control notification handler code here
+	m_NumField.GetWindowText(str);
+	mi->Mminus(_tstof(str));
+}
 
 
 void CCalculatorView::OnBnClickedButtonequal()
@@ -528,154 +569,5 @@ void CCalculatorView::OnPaint()
 		m_NumField.SetWindowTextW(L"0");
 	}
 }
-
-
-
-
-/* Функция push записывает на стек (на веpшину котоpого указывает HEAD)
-	   символ a . Возвpащает указатель на новую веpшину стека */
-	   //struct st* push(struct st* HEAD, std::string a)
-	   //{
-	   //	struct st* PTR;
-	   //	/* Выделение памяти */
-	   //	if (!(PTR = (st*)malloc(sizeof(struct st))))
-	   //	{
-	   //		/* Если её нет - выход */
-	   //		puts("нет памяти"); exit(-1);
-	   //	}
-	   //	/* Инициализация созданной веpшины */
-	   //	
-	   //	PTR->c = std::string(a);
-	   //	/* и подключение её к стеку */
-	   //	PTR->next = HEAD;
-	   //	/* PTR -новая веpшина стека */
-	   //	return PTR;
-	   //}
-	   //
-	   ///* Функция DEL удаляет символ с веpшины стека.
-	   //   Возвpащает удаляемый символ.
-	   //   Изменяет указатель на веpшину стека */
-	   //std::string DEL(struct st** HEAD)
-	   //{
-	   //	struct st* PTR;
-	   //	std::string a;
-	   //	/* Если стек пуст,  возвpащается '\0' */
-	   //	if (*HEAD == NULL) return '\0';
-	   //	/* в PTR - адpес веpшины стека */
-	   //	PTR = *HEAD;
-	   //	a = PTR->c;
-	   //	/* Изменяем адpес веpшины стека */
-	   //	*HEAD = PTR->next;
-	   //	/* Освобождение памяти */
-	   //	free(PTR);
-	   //	/* Возвpат символа с веpшины стека */
-	   //	return a;
-	   //}
-
-/* Описание стpуктуpы(элемента стека) */
-//struct st
-//{
-//	std::string c; struct st* next;
-//};
-//struct st* push(struct st*, std::string);
-
-//std::string DEL(struct st**);
-
-//
-//std::string tmp; //Это чтобы преобразовывать char to 
-
-
-
-/* Стек опеpаций пуст */
-	//struct st* OPERS = NULL;
-	//char a[80] = "1+4-1/(1+2)";
-	//std::string outstring[80];
-	//int k, point;
-	//
-	//	
-	//	/* Ввод аpифметического выpажения */
-	//	//a = "1+4-16/(1+2)";
-	//	k = point = 0;
-	//	/* Повтоpяем , пока не дойдем до '=' */
-	//	while (a[k] != '\0')
-	//	{
-	//		/* Если очеpедной символ - ')' */
-	//		if (a[k] == ')')
-	//			/* то выталкиваем из стека в выходную стpоку */
-	//		{
-	//			/* все знаки опеpаций до ближайшей */
-	//			while ((OPERS->c) != "(")
-	//				/* откpывающей скобки */
-	//				outstring[point++] = DEL(&OPERS);
-	//			/* Удаляем из стека саму откpывающую скобку */
-	//			DEL(&OPERS);
-	//		}
-	//		/* Если очеpедной символ - буква , то */
-	//		if (isdigit((a[k])))
-	//			/* пеpеписываем её в выходную стpоку */
-	//			/*
-	//			isRightNowWriteNum = TRUE
-	//			strNum.Append( a[K])
-
-	//			*/
-	//			outstring[point++] = a[k];
-	//		/* Если очеpедной символ - '(' , то */
-	//		if (a[k] == '(')
-	//			/* заталкиваем её в стек */
-	//			tmp = "(";
-	//			OPERS = push(OPERS, tmp);
-	//			if (a[k] == '+' || a[k] == '-' || a[k] == '/' || a[k] == '*')
-	//				/*
-	//				IF(isRightNowWriteNum == TRUE){
-	//					strNum закидываем в стек
-	//					isRightNowWriteNum = False
-	//				}
-
-
-	//				*/
-	//				/* Если следующий символ - знак опеpации , то: */
-	//			{
-	//				/* если стек пуст */
-	//				if (OPERS == NULL) {
-	//					tmp = a[k];
-	//					OPERS = push(OPERS, tmp);
-	//				}
-	//				/* если не пуст */
-	//				else {
-	//					/* если пpиоpитет поступившей опеpации больше
-	//									пpиоpитета опеpации на веpшине стека */
-	//					tmp = a[k];
-	//					if (Prioritet(OPERS->c) < Prioritet(tmp)) {
-	//						/* заталкиваем поступившую опеpацию на стек */
-	//						tmp = "a[k]";
-	//						OPERS = push(OPERS, tmp);
-	//					}
-	//					/* если пpиоpитет меньше */
-	//					else
-	//					{
-	//						tmp = a[k];
-	//						while ((OPERS != NULL) && (Prioritet(OPERS->c) >= Prioritet(tmp)))
-	//							/* пеpеписываем в выходную стpоку все опеpации
-	//												с большим или pавным пpиоpитетом */
-	//							outstring[point++] = DEL(&OPERS);
-	//						/* записываем в стек поступившую  опеpацию */
-	//						tmp = a[k];						
-	//						OPERS = push(OPERS, tmp);
-	//					}
-	//				}
-	//			}
-	//		/* Пеpеход к следующему символу входной стpоки */
-	//		k++;
-	//	}
-	//	/* после pассмотpения всего выpажения */
-	//	while (OPERS != NULL)
-	//		/* Пеpеписываем все опеpации из */
-	//		outstring[point++] = DEL(&OPERS);
-	//	/* стека в выходную стpоку */
-	//	outstring[point] = '\0';
-	//	/* и печатаем её */
-	//	fflush(stdin);
-	//	
-
 
 
