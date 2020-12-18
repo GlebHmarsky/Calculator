@@ -113,6 +113,7 @@ CCalculatorDoc* CCalculatorView::GetDocument() const // non-debug version is inl
 int Prioritet(char);
 void RPN(ExpOp*);
 void Push(ExpOp*, ExpOp**);
+double CalculateRPN(ExpOp**);
 
 ExpOp* Head = NULL;
 ExpOp* OutRPN = NULL;
@@ -260,7 +261,7 @@ void CCalculatorView::OnBnClickedButtonmult()
 	AddToExpression('*');
 }
 
-
+//Добавление оператора к строке числа
 void CCalculatorView::AddToExpression(char op)
 {
 	m_NumField.GetWindowText(str);
@@ -351,6 +352,12 @@ void CCalculatorView::OutToEdit(ExpOp* HEAD) {
 	}
 	m_EditBox.SetWindowTextW(str);
 }
+
+void CCalculatorView::OutToEdit(double Result) {
+	CString tmp;
+	tmp.Format(L"%g", Result);
+	m_NumField.SetWindowTextW(tmp);
+}
 /*-------------------------------------------------------------------------------*/
 
 
@@ -361,9 +368,14 @@ void CCalculatorView::OnBnClickedButtonequal()
 	/*Добавить последние число в стек и жить поживать*/
 	m_NumField.GetWindowText(str);
 	Push(new ExpOp(_tstof(str)), &Head);
+	OutToEdit(Head);
+	isNumberEmpty = true;
+	isOperatorStand = false;
 
 	RPN(Head);
-	OutToEdit(OutRPN);
+	//OutToEdit(OutRPN);
+	OutToEdit(CalculateRPN(&OutRPN));
+	
 }
 
 //Формирование обратной польской записи
@@ -424,9 +436,34 @@ void RPN(ExpOp* HEAD) {
 
 }
 
-double CalculateRPN(ExpOp* RPN) {
+double CalculateRPN(ExpOp** hRPN) {
+	ExpOp* el = Pull(hRPN);
 
-
+	//Если элемент число - то возвращаем его
+	if (el->isNum) {
+		return el->GetNum();
+	}
+	//Иначе это опратор
+	double a, b; //Элементы выражения
+	b = CalculateRPN(hRPN);
+	a = CalculateRPN(hRPN);
+	switch (el->GetOp())
+	{
+	case '+':
+		return a + b;
+		break;
+	case '-':
+		return a - b;
+		break;
+	case '*':
+		return a * b;
+		break;
+	case '/':
+		return a / b;
+		break;
+	default:
+		break;
+	}
 
 }
 /* Функция Prioritet возвpащает пpиоpитет аpифм. опеpации */

@@ -47,6 +47,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	void OutToEdit(ExpOp*);
+	void OutToEdit(double);
 	void AddToNumField(LPCSTR);
 	void AddToExpression(char);
 	CEdit m_EditBox;
