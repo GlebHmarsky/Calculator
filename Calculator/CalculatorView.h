@@ -70,6 +70,8 @@ public:
 	afx_msg void OnBnClickedButtonminus();
 	afx_msg void OnBnClickedButtondiff();
 	afx_msg void OnBnClickedButtonmult();
+	afx_msg void OnBnClickedButtonopeningpar();
+	afx_msg void OnBnClickedButtonclosingpar();
 };
 
 #ifndef _DEBUG  // debug version in CalculatorView.cpp

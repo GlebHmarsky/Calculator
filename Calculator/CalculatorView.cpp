@@ -47,6 +47,8 @@ BEGIN_MESSAGE_MAP(CCalculatorView, CFormView)
 	ON_BN_CLICKED(IDC_BUTTONMINUS, &CCalculatorView::OnBnClickedButtonminus)
 	ON_BN_CLICKED(IDC_BUTTONDIFF, &CCalculatorView::OnBnClickedButtondiff)
 	ON_BN_CLICKED(IDC_BUTTONMULT, &CCalculatorView::OnBnClickedButtonmult)
+	ON_BN_CLICKED(IDC_BUTTONOPENINGPAR, &CCalculatorView::OnBnClickedButtonopeningpar)
+	ON_BN_CLICKED(IDC_BUTTONCLOSINGPAR, &CCalculatorView::OnBnClickedButtonclosingpar)
 END_MESSAGE_MAP()
 
 // CCalculatorView construction/destruction
@@ -117,24 +119,19 @@ double CalculateRPN(ExpOp**);
 
 ExpOp* Head = NULL;
 ExpOp* OutRPN = NULL;
+int countBreckets = 0;
+bool isOpenBrStand = false;
+bool isCloseBrLast = false;
 bool CommaIsStands = false; //Отвечает за то, что точка в числе уже стоит. 
 bool isNumberEmpty = true; //Отвечает за то, что число ещё не было написано (используется старое значение)
 bool isOperatorStand = false; //Отвечает за то, что поставлен бинарный оператор (который в случае нужно заменить)
-
+bool isItCalculate = false;
 
 void CCalculatorView::OnBnClickedButton1()
 {
 	// TODO: Add your control notification handler code here
 	AddToNumField("1");
-	/*m_NumField.GetWindowText(str);
-	if (str == L"0") {
-		m_NumField.SetWindowTextW(L"1");
-	}
-	else {
-		m_NumField.SetWindowTextW(str + "1");
-	}*/
 }
-
 
 void CCalculatorView::OnBnClickedButton2()
 {
@@ -192,11 +189,15 @@ void CCalculatorView::OnBnClickedButton0()
 		m_NumField.SetWindowTextW(L"0");
 		isNumberEmpty = false;
 	}
-	else 
+	else {
+		m_NumField.GetWindowText(str);
 		if (str != L"0") {
-			m_NumField.GetWindowText(str);
 			m_NumField.SetWindowTextW(str + "0");
 		}
+		else {
+			m_NumField.SetWindowTextW(L"0");
+		}
+	}
 	isOperatorStand = false;
 }
 
@@ -229,14 +230,7 @@ void CCalculatorView::AddToNumField(LPCSTR num) {
 	isOperatorStand = false;
 }
 
-/*
-ОМЕГА ЛУЛ ЗНАНИЯ!!!
 
-CString thestring("13.37");
-double d = atof(thestring).
-
-
-*/
 void CCalculatorView::OnBnClickedButtonplus()
 {
 	// TODO: Add your control notification handler code here
@@ -266,21 +260,56 @@ void CCalculatorView::AddToExpression(char op)
 {
 	m_NumField.GetWindowText(str);
 	if (!isOperatorStand) {
-		Push(new ExpOp(_tstof(str)), &Head);
+		if(!isItCalculate && !isCloseBrLast) Push(new ExpOp(_tstof(str)), &Head);
 		Push(new ExpOp(op), &Head);
-		OutToEdit(Head);
 		isNumberEmpty = true;
 		isOperatorStand = true;
+		CommaIsStands = false; 
 	}
 	else
 	{
-		/*
-		* Удалить последний эл в Head
-		* Добавить новый
-		* А может просто достать последний и поменять его??????????
-		* Есть же SetOp! 
-		*/
+		Head->prev->SetOp('op');
 	}
+	OutToEdit(Head);
+	//isOpenBrStand = false;
+	isCloseBrLast = false;
+}
+
+void CCalculatorView::OnBnClickedButtonopeningpar()
+{
+	// TODO: Add your control notification handler code here
+	if (isCloseBrLast) return;
+	countBreckets++;
+	Push(new ExpOp('('), &Head);
+	OutToEdit(Head);
+	isOpenBrStand = true;
+}
+
+
+void CCalculatorView::OnBnClickedButtonclosingpar()
+{
+	// TODO: Add your control notification handler code here
+	if (--countBreckets < 0) {
+		countBreckets = 0;
+		//Просто не ставим ничего
+		return;
+	}
+	/*Если скобку поставить можно, то:
+	-Добавим в неё число, если был оператор или просто перед ней стоит октрывающая скобка
+	-Закроем, если, к примеру, идут 2 скобки подряд
+	*/
+	m_NumField.GetWindowText(str);
+	if (isOpenBrStand) {
+		Push(new ExpOp(_tstof(str)), &Head);
+		Push(new ExpOp(')'), &Head);
+		isOpenBrStand = false;
+	}
+	else{
+		Push(new ExpOp(')'), &Head);
+		OutToEdit(Head);
+	}
+	OutToEdit(Head);
+	isCloseBrLast = true;
 }
 
 
@@ -367,10 +396,12 @@ void CCalculatorView::OnBnClickedButtonequal()
 	// TODO: Add your control notification handler code here
 	/*Добавить последние число в стек и жить поживать*/
 	m_NumField.GetWindowText(str);
-	Push(new ExpOp(_tstof(str)), &Head);
+	if (!isCloseBrLast) Push(new ExpOp(_tstof(str)), &Head);
 	OutToEdit(Head);
+
 	isNumberEmpty = true;
 	isOperatorStand = false;
+	isItCalculate = true;
 
 	RPN(Head);
 	//OutToEdit(OutRPN);
@@ -466,6 +497,7 @@ double CalculateRPN(ExpOp** hRPN) {
 	}
 
 }
+
 /* Функция Prioritet возвpащает пpиоpитет аpифм. опеpации */
 int Prioritet(char a){
 	switch (a)
@@ -644,4 +676,6 @@ void CCalculatorView::OnPaint()
 	//	/* и печатаем её */
 	//	fflush(stdin);
 	//	
+
+
 
