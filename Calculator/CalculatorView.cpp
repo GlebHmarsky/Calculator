@@ -124,6 +124,9 @@ int Prioritet(char);
 void RPN(ExpOp*);
 void Push(ExpOp*, ExpOp**);
 double CalculateRPN(ExpOp**);
+ExpOp* GoBackToOpenBr(ExpOp**);
+void InsertTo(ExpOp*, ExpOp**, ExpOp**);
+bool IsUnaryOp(char);
 
 ExpOp* Head = NULL;
 ExpOp* OutRPN = NULL;
@@ -274,11 +277,24 @@ void CCalculatorView::OnBnClickedButtonsqrt()
 {
 	// TODO: Add your control notification handler code here
 	if (isCloseBrLast) {
-
+		ExpOp* t = GoBackToOpenBr(&(Head->prev));
+		if (IsUnaryOp(t->GetOp())) {
+			InsertTo(new ExpOp('('), &(t), &Head);
+			countBreckets++;
+			OnBnClickedButtonclosingpar();
+			t = t->prev;
+		}
+		InsertTo(new ExpOp('s'), &(t), &Head);
 	}
+	// Если скобка последний символ не закрывающая скобка
 	else {
+		OnBnClickedButtonopeningpar();
+		OnBnClickedButtonclosingpar();
 
+		ExpOp* t = GoBackToOpenBr(&(Head->prev));
+		InsertTo(new ExpOp('s'), &(t), &Head);
 	}
+	OutToEdit(Head);
 }
 
 
@@ -339,8 +355,13 @@ void CCalculatorView::OnBnClickedButtonclosingpar()
 	isCloseBrLast = true;
 }
 
-
+bool IsUnaryOp(char a) {
+	if (a == 's')
+		return true;
+	return false;
+}
 /*-------------------------------------------------------------------------------*/
+
 
 void Push(ExpOp *el, ExpOp **HEAD) {
 	//if Head is empty
@@ -380,6 +401,23 @@ void PushBack(ExpOp* el, ExpOp** HEAD) {
 	}
 }
 
+void InsertTo(ExpOp* el, ExpOp** PlaceTo, ExpOp** HEAD) {
+	//Если это начало списка
+	if ((*PlaceTo)->prev->next == NULL) {
+		el->prev = (*PlaceTo)->prev;
+		el->next = (*PlaceTo);
+		(*PlaceTo)->prev = el;
+		(*HEAD) = el;
+	}
+	//Если середина или конец
+	else {
+		el->prev = (*PlaceTo)->prev;
+		el->next = (*PlaceTo);
+		(*PlaceTo)->prev->next = el;
+		(*PlaceTo)->prev = el;
+	}
+}
+
 void ClearList(ExpOp** HEAD) {
 	for (ExpOp* t = *HEAD; t; t = *HEAD)
 	{
@@ -400,9 +438,17 @@ ExpOp* Pull(ExpOp** HEAD) {
 	}
 }
 
-ExpOp* GoTo(char ch, ExpOp** HEAD) {
-	for (ExpOp* t = *HEAD; t; t = t->prev) {
-		if (t->GetOp() == ch) return t;
+ExpOp* GoBackToOpenBr(ExpOp** From) {
+	int count = 1;
+	for (ExpOp* t = (*From)->prev; t; t = t->prev) {
+		if (t->GetOp() == ')') 
+			count++;
+
+		if (t->GetOp() == '(')
+			if (--count == 0) {
+				if (IsUnaryOp(t->prev->GetOp())) return t->prev;
+				else return t;
+			}
 	}
 	return NULL;
 }
@@ -545,7 +591,7 @@ void RPN(ExpOp* HEAD) {
 			}
 		}
 		/* Если унарная операция */
-		if (tp->GetOp() == '√' )
+		if (tp->GetOp() == 's' )
 		{
 			PushBack(new ExpOp(tp), &UnOpList);
 		}
@@ -570,6 +616,15 @@ double CalculateRPN(ExpOp** hRPN) {
 	//Иначе это опратор
 	double a, b; //Элементы выражения
 	b = CalculateRPN(hRPN);
+	// Если унарный оператор
+	switch (el->GetOp())
+	{
+	case 's':
+		return sqrt(b);
+		break;
+	}
+
+
 	a = CalculateRPN(hRPN);
 	switch (el->GetOp())
 	{
