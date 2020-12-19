@@ -1,4 +1,4 @@
-
+п»ї
 // CalculatorView.cpp : implementation of the CCalculatorView class
 //
 
@@ -54,6 +54,9 @@ BEGIN_MESSAGE_MAP(CCalculatorView, CFormView)
 	ON_BN_CLICKED(IDC_BUTTONMS, &CCalculatorView::OnBnClickedButtonms)
 	ON_BN_CLICKED(IDC_BUTTONMPLUS, &CCalculatorView::OnBnClickedButtonmplus)
 	ON_BN_CLICKED(IDC_BUTTONMMINUS, &CCalculatorView::OnBnClickedButtonmminus)
+	ON_BN_CLICKED(IDC_BUTTONCLEARALL, &CCalculatorView::OnBnClickedButtonclearall)
+	ON_BN_CLICKED(IDC_BUTTONPOW, &CCalculatorView::OnBnClickedButtonpow)
+	ON_BN_CLICKED(IDC_BUTTONSQRT, &CCalculatorView::OnBnClickedButtonsqrt)
 END_MESSAGE_MAP()
 
 // CCalculatorView construction/destruction
@@ -128,9 +131,9 @@ MemoryItem* mi = new MemoryItem();
 int countBreckets = 0;
 bool isOpenBrStand = false;
 bool isCloseBrLast = false;
-bool CommaIsStands = false; //Отвечает за то, что точка в числе уже стоит. 
-bool isNumberEmpty = true; //Отвечает за то, что число ещё не было написано (используется старое значение)
-bool isOperatorStand = false; //Отвечает за то, что поставлен бинарный оператор (который в случае нужно заменить)
+bool CommaIsStands = false; //РћС‚РІРµС‡Р°РµС‚ Р·Р° С‚Рѕ, С‡С‚Рѕ С‚РѕС‡РєР° РІ С‡РёСЃР»Рµ СѓР¶Рµ СЃС‚РѕРёС‚. 
+bool isNumberEmpty = true; //РћС‚РІРµС‡Р°РµС‚ Р·Р° С‚Рѕ, С‡С‚Рѕ С‡РёСЃР»Рѕ РµС‰С‘ РЅРµ Р±С‹Р»Рѕ РЅР°РїРёСЃР°РЅРѕ (РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ СЃС‚Р°СЂРѕРµ Р·РЅР°С‡РµРЅРёРµ)
+bool isOperatorStand = false; //РћС‚РІРµС‡Р°РµС‚ Р·Р° С‚Рѕ, С‡С‚Рѕ РїРѕСЃС‚Р°РІР»РµРЅ Р±РёРЅР°СЂРЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ (РєРѕС‚РѕСЂС‹Р№ РІ СЃР»СѓС‡Р°Рµ РЅСѓР¶РЅРѕ Р·Р°РјРµРЅРёС‚СЊ)
 bool isItCalculate = false;
 
 void CCalculatorView::OnBnClickedButton1()
@@ -223,7 +226,7 @@ void CCalculatorView::OnBnClickedButtoncomma()
 	isOperatorStand = false;
 }
 
-//Добавление цифры к строке числа
+//Р”РѕР±Р°РІР»РµРЅРёРµ С†РёС„СЂС‹ Рє СЃС‚СЂРѕРєРµ С‡РёСЃР»Р°
 void CCalculatorView::AddToNumField(LPCSTR num) {
 	m_NumField.GetWindowText(str);
 	if (str == L"0" || isNumberEmpty) {
@@ -261,7 +264,25 @@ void CCalculatorView::OnBnClickedButtonmult()
 	AddToExpression('*');
 }
 
-//Добавление оператора к строке числа
+void CCalculatorView::OnBnClickedButtonpow()
+{
+	// TODO: Add your control notification handler code here
+	AddToExpression('^');
+}
+
+void CCalculatorView::OnBnClickedButtonsqrt()
+{
+	// TODO: Add your control notification handler code here
+	if (isCloseBrLast) {
+
+	}
+	else {
+
+	}
+}
+
+
+//Р”РѕР±Р°РІР»РµРЅРёРµ РѕРїРµСЂР°С‚РѕСЂР° Рє СЃС‚СЂРѕРєРµ С‡РёСЃР»Р°
 void CCalculatorView::AddToExpression(char op)
 {
 	m_NumField.GetWindowText(str);
@@ -274,13 +295,14 @@ void CCalculatorView::AddToExpression(char op)
 	}
 	else
 	{
-		Head->prev->SetOp('op');
+		Head->prev->SetOp(op);
 	}
 	OutToEdit(Head);
 	//isOpenBrStand = false;
 	isCloseBrLast = false;
 }
 
+/*  РЎРєРѕР±РєРё  */
 void CCalculatorView::OnBnClickedButtonopeningpar()
 {
 	// TODO: Add your control notification handler code here
@@ -291,18 +313,17 @@ void CCalculatorView::OnBnClickedButtonopeningpar()
 	isOpenBrStand = true;
 }
 
-
 void CCalculatorView::OnBnClickedButtonclosingpar()
 {
 	// TODO: Add your control notification handler code here
 	if (--countBreckets < 0) {
 		countBreckets = 0;
-		//Просто не ставим ничего
+		//РџСЂРѕСЃС‚Рѕ РЅРµ СЃС‚Р°РІРёРј РЅРёС‡РµРіРѕ
 		return;
 	}
-	/*Если скобку поставить можно, то:
-	-Добавим в неё число, если был оператор или просто перед ней стоит октрывающая скобка
-	-Закроем, если, к примеру, идут 2 скобки подряд
+	/*Р•СЃР»Рё СЃРєРѕР±РєСѓ РїРѕСЃС‚Р°РІРёС‚СЊ РјРѕР¶РЅРѕ, С‚Рѕ:
+	-Р”РѕР±Р°РІРёРј РІ РЅРµС‘ С‡РёСЃР»Рѕ, РµСЃР»Рё Р±С‹Р» РѕРїРµСЂР°С‚РѕСЂ РёР»Рё РїСЂРѕСЃС‚Рѕ РїРµСЂРµРґ РЅРµР№ СЃС‚РѕРёС‚ РѕРєС‚СЂС‹РІР°СЋС‰Р°СЏ СЃРєРѕР±РєР°
+	-Р—Р°РєСЂРѕРµРј, РµСЃР»Рё, Рє РїСЂРёРјРµСЂСѓ, РёРґСѓС‚ 2 СЃРєРѕР±РєРё РїРѕРґСЂСЏРґ
 	*/
 	m_NumField.GetWindowText(str);
 	if (isOpenBrStand) {
@@ -349,7 +370,7 @@ void PushToHead(ExpOp* el, ExpOp** HEAD) {
 
 void PushBack(ExpOp* el, ExpOp** HEAD) {
 	/*if Head is empty
-	Но мы уже не будем использовать ->prev т.к. мы просто используем стек*/
+	РќРѕ РјС‹ СѓР¶Рµ РЅРµ Р±СѓРґРµРј РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ ->prev С‚.Рє. РјС‹ РїСЂРѕСЃС‚Рѕ РёСЃРїРѕР»СЊР·СѓРµРј СЃС‚РµРє*/
 	if (!*HEAD) {
 		*HEAD = el;
 	}
@@ -357,6 +378,15 @@ void PushBack(ExpOp* el, ExpOp** HEAD) {
 		el->next = *HEAD;
 		(*HEAD) = el;
 	}
+}
+
+void ClearList(ExpOp** HEAD) {
+	for (ExpOp* t = *HEAD; t; t = *HEAD)
+	{
+		*HEAD = (*HEAD)->next;
+		delete(t);
+	}
+	*HEAD = NULL;
 }
 
 ExpOp* Pull(ExpOp** HEAD) {
@@ -368,6 +398,13 @@ ExpOp* Pull(ExpOp** HEAD) {
 		*HEAD = (*HEAD)->next;
 		return tmp;
 	}
+}
+
+ExpOp* GoTo(char ch, ExpOp** HEAD) {
+	for (ExpOp* t = *HEAD; t; t = t->prev) {
+		if (t->GetOp() == ch) return t;
+	}
+	return NULL;
 }
 
 void CCalculatorView::OutToEdit(ExpOp* HEAD) {
@@ -393,6 +430,8 @@ void CCalculatorView::OutToEdit(double Result) {
 	tmp.Format(L"%g", Result);
 	m_NumField.SetWindowTextW(tmp);
 }
+
+
 /*-------------------------------------------------------------------------------*/
 
 void CCalculatorView::OnBnClickedButtonmc()
@@ -431,11 +470,17 @@ void CCalculatorView::OnBnClickedButtonmminus()
 	mi->Mminus(_tstof(str));
 }
 
+void CCalculatorView::CloseAllBreakets() {
+	while (countBreckets) 
+		OnBnClickedButtonclosingpar();
+
+}
 
 void CCalculatorView::OnBnClickedButtonequal()
 {
 	// TODO: Add your control notification handler code here
-	/*Добавить последние число в стек и жить поживать*/
+	CloseAllBreakets();
+	/*Р”РѕР±Р°РІРёС‚СЊ РїРѕСЃР»РµРґРЅРёРµ С‡РёСЃР»Рѕ РІ СЃС‚РµРє Рё Р¶РёС‚СЊ РїРѕР¶РёРІР°С‚СЊ*/
 	m_NumField.GetWindowText(str);
 	if (!isCloseBrLast) Push(new ExpOp(_tstof(str)), &Head);
 	OutToEdit(Head);
@@ -450,73 +495,80 @@ void CCalculatorView::OnBnClickedButtonequal()
 	
 }
 
-//Формирование обратной польской записи
+//Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РѕР±СЂР°С‚РЅРѕР№ РїРѕР»СЊСЃРєРѕР№ Р·Р°РїРёСЃРё
 void RPN(ExpOp* HEAD) {
 	
-	ExpOp* tp = NULL, *OpList = NULL;
+	ExpOp* tp = NULL, *OpList = NULL, *UnOpList = NULL;
 	OutRPN = NULL;
 
 	for(tp = HEAD ; tp ; tp = tp->next)
 	{
-		/* Если очеpедной символ - ')' */
-		if (tp->GetOp() == ')')/* то выталкиваем из стека в выходную стpоку */
+		/* Р•СЃР»Рё РѕС‡РµpРµРґРЅРѕР№ СЃРёРјРІРѕР» - ')' */
+		if (tp->GetOp() == ')')/* С‚Рѕ РІС‹С‚Р°Р»РєРёРІР°РµРј РёР· СЃС‚РµРєР° РІ РІС‹С…РѕРґРЅСѓСЋ СЃС‚pРѕРєСѓ */
 		{
-			/* все знаки опеpаций до ближайшей  откpывающей скобки */
+			/* РІСЃРµ Р·РЅР°РєРё РѕРїРµpР°С†РёР№ РґРѕ Р±Р»РёР¶Р°Р№С€РµР№  РѕС‚РєpС‹РІР°СЋС‰РµР№ СЃРєРѕР±РєРё */
 			while (OpList->GetOp() != '(')
 				PushBack(Pull(&OpList), &OutRPN);
-			/* Удаляем из стека саму откpывающую скобку */
+			/* РЈРґР°Р»СЏРµРј РёР· СЃС‚РµРєР° СЃР°РјСѓ РѕС‚РєpС‹РІР°СЋС‰СѓСЋ СЃРєРѕР±РєСѓ */
 			Pull(&OpList);
+			if(UnOpList) PushBack(Pull(&UnOpList),&OutRPN);/* РџСѓС€РёРј РїРѕСЃР»РµРґРЅСЋСЋ СѓСЂР°РЅСѓСЋ РѕРїРµСЂР°С†РёСЋ РІ СЃС‚РµРє */
 		}
-		/* Если очеpедной символ - буква , то */
-		if (tp->isNum)/* пеpеписываем её в выходную стpоку */
+		/* Р•СЃР»Рё РѕС‡РµpРµРґРЅРѕР№ СЃРёРјРІРѕР» - Р±СѓРєРІР° , С‚Рѕ */
+		if (tp->isNum)/* РїРµpРµРїРёСЃС‹РІР°РµРј РµС‘ РІ РІС‹С…РѕРґРЅСѓСЋ СЃС‚pРѕРєСѓ */
 			PushBack(new ExpOp(tp), &OutRPN);
 		
 		
-		/* Если очеpедной символ - '(' , то заталкиваем её в стек */
+		/* Р•СЃР»Рё РѕС‡РµpРµРґРЅРѕР№ СЃРёРјРІРѕР» - '(' , С‚Рѕ Р·Р°С‚Р°Р»РєРёРІР°РµРј РµС‘ РІ СЃС‚РµРє */
 		if (tp->GetOp() == '(') 
 			PushBack(new ExpOp(tp), &OpList);
 
-		if (tp->GetOp() == '+' || tp->GetOp() == '-' || tp->GetOp() == '/' || tp->GetOp() == '*')
-			/* Если следующий символ - знак опеpации , то: */
+		if (tp->GetOp() == '+' || tp->GetOp() == '-' || tp->GetOp() == '/' || tp->GetOp() == '*'|| tp->GetOp() == '^')
 		{
 			if (!OpList) {
 				PushBack(new ExpOp(tp), &OpList);
 			}
 			else {
-				/* если пpиоpитет поступившей опеpации больше пpиоpитета опеpации на веpшине стека */
+				/* РµСЃР»Рё РїpРёРѕpРёС‚РµС‚ РїРѕСЃС‚СѓРїРёРІС€РµР№ РѕРїРµpР°С†РёРё Р±РѕР»СЊС€Рµ РїpРёРѕpРёС‚РµС‚Р° РѕРїРµpР°С†РёРё РЅР° РІРµpС€РёРЅРµ СЃС‚РµРєР° */
 				if (Prioritet(OpList->GetOp()) < Prioritet(tp->GetOp())) {
-					/* заталкиваем поступившую опеpацию на стек */
+					/* Р·Р°С‚Р°Р»РєРёРІР°РµРј РїРѕСЃС‚СѓРїРёРІС€СѓСЋ РѕРїРµpР°С†РёСЋ РЅР° СЃС‚РµРє */
 					PushBack(new ExpOp(tp), &OpList);
 				}
-				/* если пpиоpитет меньше */
+				/* РµСЃР»Рё РїpРёРѕpРёС‚РµС‚ РјРµРЅСЊС€Рµ */
 				else
 				{
-					/* пеpеписываем в выходную стpоку все опеpации с большим или pавным пpиоpитетом */
+					/* РїРµpРµРїРёСЃС‹РІР°РµРј РІ РІС‹С…РѕРґРЅСѓСЋ СЃС‚pРѕРєСѓ РІСЃРµ РѕРїРµpР°С†РёРё СЃ Р±РѕР»СЊС€РёРј РёР»Рё pР°РІРЅС‹Рј РїpРёРѕpРёС‚РµС‚РѕРј */
 					while (OpList && (Prioritet(OpList->GetOp()) >= Prioritet(tp->GetOp())))
 						PushBack(Pull(&OpList), &OutRPN);
-					/* записываем в стек поступившую  опеpацию */
+					/* Р·Р°РїРёСЃС‹РІР°РµРј РІ СЃС‚РµРє РїРѕСЃС‚СѓРїРёРІС€СѓСЋ  РѕРїРµpР°С†РёСЋ */
 					PushBack(new ExpOp(tp), &OpList);
 				}
 			}
 		}
-		/* Пеpеход к следующему символу входной стpоки */
+		/* Р•СЃР»Рё СѓРЅР°СЂРЅР°СЏ РѕРїРµСЂР°С†РёСЏ */
+		if (tp->GetOp() == 'в€љ' )
+		{
+			PushBack(new ExpOp(tp), &UnOpList);
+		}
+
+		/* РџРµpРµС…РѕРґ Рє СЃР»РµРґСѓСЋС‰РµРјСѓ СЌР»РµРјРµРЅС‚Сѓ РІС…РѕРґРЅРѕР№ СЃС‚pРѕРєРё */
 	}
-	/* после pассмотpения всего выpажения */
-	while (OpList)
-		/* Пеpеписываем все опеpации из */
+	/* РїРѕСЃР»Рµ pР°СЃСЃРјРѕС‚pРµРЅРёСЏ РІСЃРµРіРѕ РІС‹pР°Р¶РµРЅРёСЏ */
+	while (OpList)/* РџРµpРµРїРёСЃС‹РІР°РµРј РІСЃРµ РѕРїРµpР°С†РёРё РёР· */
 		PushBack(Pull(&OpList), &OutRPN);
 
+	while (UnOpList)
+		PushBack(Pull(&UnOpList), &OutRPN);
 }
 
 double CalculateRPN(ExpOp** hRPN) {
 	ExpOp* el = Pull(hRPN);
 
-	//Если элемент число - то возвращаем его
+	//Р•СЃР»Рё СЌР»РµРјРµРЅС‚ С‡РёСЃР»Рѕ - С‚Рѕ РІРѕР·РІСЂР°С‰Р°РµРј РµРіРѕ
 	if (el->isNum) {
 		return el->GetNum();
 	}
-	//Иначе это опратор
-	double a, b; //Элементы выражения
+	//РРЅР°С‡Рµ СЌС‚Рѕ РѕРїСЂР°С‚РѕСЂ
+	double a, b; //Р­Р»РµРјРµРЅС‚С‹ РІС‹СЂР°Р¶РµРЅРёСЏ
 	b = CalculateRPN(hRPN);
 	a = CalculateRPN(hRPN);
 	switch (el->GetOp())
@@ -533,16 +585,21 @@ double CalculateRPN(ExpOp** hRPN) {
 	case '/':
 		return a / b;
 		break;
+	case '^':
+		return pow(a,b);
+		break;
 	default:
 		break;
 	}
 
 }
 
-/* Функция Prioritet возвpащает пpиоpитет аpифм. опеpации */
+/* Р¤СѓРЅРєС†РёСЏ Prioritet РІРѕР·РІpР°С‰Р°РµС‚ РїpРёРѕpРёС‚РµС‚ Р°pРёС„Рј. РѕРїРµpР°С†РёРё */
 int Prioritet(char a){
 	switch (a)
 	{
+	case '^':
+		return 4;
 	case '*':
 	case '/':
 		return 3;
@@ -558,7 +615,7 @@ int Prioritet(char a){
 }
 
 
-//Ставим 0 при перерисовки окна в том случае если поле с числом пустое
+//РЎС‚Р°РІРёРј 0 РїСЂРё РїРµСЂРµСЂРёСЃРѕРІРєРё РѕРєРЅР° РІ С‚РѕРј СЃР»СѓС‡Р°Рµ РµСЃР»Рё РїРѕР»Рµ СЃ С‡РёСЃР»РѕРј РїСѓСЃС‚РѕРµ
 void CCalculatorView::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
@@ -569,5 +626,24 @@ void CCalculatorView::OnPaint()
 		m_NumField.SetWindowTextW(L"0");
 	}
 }
+
+void CCalculatorView::OnBnClickedButtonclearall()
+{
+	// TODO: Add your control notification handler code here
+	ClearList(&Head);
+	ClearList(&OutRPN);
+	countBreckets = 0;
+	isOpenBrStand = false;
+	isCloseBrLast = false;
+	CommaIsStands = false; //РћС‚РІРµС‡Р°РµС‚ Р·Р° С‚Рѕ, С‡С‚Рѕ С‚РѕС‡РєР° РІ С‡РёСЃР»Рµ СѓР¶Рµ СЃС‚РѕРёС‚. 
+	isNumberEmpty = true; //РћС‚РІРµС‡Р°РµС‚ Р·Р° С‚Рѕ, С‡С‚Рѕ С‡РёСЃР»Рѕ РµС‰С‘ РЅРµ Р±С‹Р»Рѕ РЅР°РїРёСЃР°РЅРѕ (РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ СЃС‚Р°СЂРѕРµ Р·РЅР°С‡РµРЅРёРµ)
+	isOperatorStand = false; //РћС‚РІРµС‡Р°РµС‚ Р·Р° С‚Рѕ, С‡С‚Рѕ РїРѕСЃС‚Р°РІР»РµРЅ Р±РёРЅР°СЂРЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ (РєРѕС‚РѕСЂС‹Р№ РІ СЃР»СѓС‡Р°Рµ РЅСѓР¶РЅРѕ Р·Р°РјРµРЅРёС‚СЊ)
+	isItCalculate = false;
+
+	OutToEdit(Head);
+	m_NumField.SetWindowTextW(L"0");
+}
+
+
 
 

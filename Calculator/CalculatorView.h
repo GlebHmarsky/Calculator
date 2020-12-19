@@ -50,6 +50,7 @@ public:
 	void OutToEdit(double);
 	void AddToNumField(LPCSTR);
 	void AddToExpression(char);
+	void CloseAllBreakets();
 	CEdit m_EditBox;
 	CEdit m_NumField;
 	afx_msg void OnBnClickedButton1();
@@ -77,6 +78,9 @@ public:
 	afx_msg void OnBnClickedButtonms();
 	afx_msg void OnBnClickedButtonmplus();
 	afx_msg void OnBnClickedButtonmminus();
+	afx_msg void OnBnClickedButtonclearall();
+	afx_msg void OnBnClickedButtonpow();
+	afx_msg void OnBnClickedButtonsqrt();
 };
 
 #ifndef _DEBUG  // debug version in CalculatorView.cpp
