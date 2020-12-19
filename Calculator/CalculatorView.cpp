@@ -131,7 +131,7 @@ bool IsUnaryOp(char);
 
 ExpOp* Head = NULL;
 ExpOp* OutRPN = NULL;
-MemoryItem* mi = new MemoryItem();
+//MemoryItem* mi = new MemoryItem();
 int countBreckets = 0;
 bool isOpenBrStand = false;
 bool isCloseBrLast = false;
@@ -484,14 +484,14 @@ void CCalculatorView::OutToEdit(double Result) {
 void CCalculatorView::OnBnClickedButtonmc()
 {
 	// TODO: Add your control notification handler code here
-	mi->Mclear();
+	GetDocument()->mi->Mclear();
 }
 
 void CCalculatorView::OnBnClickedButtonmr()
 {
 	// TODO: Add your control notification handler code here
 	CString tmp;
-	tmp.Format(L"%g", mi->Mread());
+	tmp.Format(L"%g", GetDocument()->mi->Mread());
 	m_NumField.SetWindowTextW(tmp);
 	isNumberEmpty = true;
 }
@@ -500,21 +500,21 @@ void CCalculatorView::OnBnClickedButtonms()
 {
 	// TODO: Add your control notification handler code here
 	m_NumField.GetWindowText(str);
-	mi->Msave(_tstof(str));
+	GetDocument()->mi->Msave(_tstof(str));
 }
 
 void CCalculatorView::OnBnClickedButtonmplus()
 {
 	// TODO: Add your control notification handler code here
 	m_NumField.GetWindowText(str);
-	mi->Mplus(_tstof(str));
+	GetDocument()->mi->Mplus(_tstof(str));
 }
 
 void CCalculatorView::OnBnClickedButtonmminus()
 {
 	// TODO: Add your control notification handler code here
 	m_NumField.GetWindowText(str);
-	mi->Mminus(_tstof(str));
+	GetDocument()->mi->Mminus(_tstof(str));
 }
 
 void CCalculatorView::CloseAllBreakets() {

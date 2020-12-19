@@ -26,6 +26,8 @@ BEGIN_MESSAGE_MAP(CCalculatorDoc, CDocument)
 END_MESSAGE_MAP()
 
 
+IMPLEMENT_SERIAL(MemoryItem, CObject, 1) // Класс, баз.класс, версия
+
 // CCalculatorDoc construction/destruction
 
 CCalculatorDoc::CCalculatorDoc() noexcept
@@ -61,12 +63,24 @@ void CCalculatorDoc::Serialize(CArchive& ar)
 	if (ar.IsStoring())
 	{
 		// TODO: add storing code here
+		mi->Serialize(ar);
 	}
 	else
 	{
 		// TODO: add loading code here
+		mi->Serialize(ar);
 	}
 }
+
+
+void MemoryItem::Serialize(CArchive& ar)
+{
+	if (ar.IsStoring())
+		ar << info;
+	else
+		ar >> info;
+}
+
 
 #ifdef SHARED_HANDLERS
 

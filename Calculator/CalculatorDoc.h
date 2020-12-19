@@ -4,10 +4,14 @@
 
 
 #pragma once
-
+#include "MemoryItem.h"
 
 class CCalculatorDoc : public CDocument
 {
+public: 
+	MemoryItem* mi = new MemoryItem();
+	
+
 protected: // create from serialization only
 	CCalculatorDoc() noexcept;
 	DECLARE_DYNCREATE(CCalculatorDoc)
