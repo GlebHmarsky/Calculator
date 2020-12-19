@@ -57,6 +57,7 @@ BEGIN_MESSAGE_MAP(CCalculatorView, CFormView)
 	ON_BN_CLICKED(IDC_BUTTONCLEARALL, &CCalculatorView::OnBnClickedButtonclearall)
 	ON_BN_CLICKED(IDC_BUTTONPOW, &CCalculatorView::OnBnClickedButtonpow)
 	ON_BN_CLICKED(IDC_BUTTONSQRT, &CCalculatorView::OnBnClickedButtonsqrt)
+	ON_BN_CLICKED(IDC_BUTTONBACKSPACE, &CCalculatorView::OnBnClickedButtonbackspace)
 END_MESSAGE_MAP()
 
 // CCalculatorView construction/destruction
@@ -699,6 +700,8 @@ void CCalculatorView::OnBnClickedButtonclearall()
 	m_NumField.SetWindowTextW(L"0");
 }
 
+void CCalculatorView::OnBnClickedButtonbackspace()
+{
+	// TODO: Add your control notification handler code here
 
-
-
+}

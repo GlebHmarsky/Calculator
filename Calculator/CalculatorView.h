@@ -81,6 +81,7 @@ public:
 	afx_msg void OnBnClickedButtonclearall();
 	afx_msg void OnBnClickedButtonpow();
 	afx_msg void OnBnClickedButtonsqrt();
+	afx_msg void OnBnClickedButtonbackspace();
 };
 
 #ifndef _DEBUG  // debug version in CalculatorView.cpp

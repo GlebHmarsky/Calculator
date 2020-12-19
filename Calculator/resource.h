@@ -44,6 +44,8 @@
 #define IDC_BUTTONMOD                   1027
 #define IDC_BUTTONPLUSMINUS             1028
 #define IDC_BUTTONSQRT                  1029
+#define IDC_BUTTONCLEARALL2             1030
+#define IDC_BUTTONBACKSPACE             1030
 
 // Next default values for new objects
 // 

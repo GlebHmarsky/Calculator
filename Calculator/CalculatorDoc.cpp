@@ -49,7 +49,9 @@ BOOL CCalculatorDoc::OnNewDocument()
 	return TRUE;
 }
 
-
+/*
+Calculator\n\nCalculator\nCalculator Files(*.txt)\n.txt\n Calculator.Document\nCalculator Document
+*/
 
 
 // CCalculatorDoc serialization
