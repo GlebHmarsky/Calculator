@@ -1024,7 +1024,7 @@ void CCalculatorView::OnBnClickedButtonbackspace()
 	m_NumField.GetWindowText(str);
 	if (isItCalculate) return;
 	if (str.GetLength() > 1) {
-		if(str.GetAt(str.GetLength()-1) == '.') CommaIsStands = true;
+		if(str.GetAt(str.GetLength()-1) == '.') CommaIsStands = false;
 		str.Delete(str.GetLength()-1);
 	}
 	else {
