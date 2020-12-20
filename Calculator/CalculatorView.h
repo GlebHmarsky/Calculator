@@ -94,6 +94,8 @@ public:
 //	afx_msg void OnEnChangeMemoryfield();
 	CEdit m_MemoryField;
 	CStatic m_TextM;
+	afx_msg void OnBnClickedButtonlg();
+	afx_msg void OnBnClickedButtonrevers();
 };
 
 #ifndef _DEBUG  // debug version in CalculatorView.cpp

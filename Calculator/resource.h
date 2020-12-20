@@ -50,8 +50,9 @@
 #define IDC_BUTTONSIN                   1033
 #define IDC_BUTTONLG                    1034
 #define IDC_MEMORYFIELD                 1035
-#define IDC_M                           1036
 #define IDC_MEMORYM                     1036
+#define IDC_BUTTONLG2                   1037
+#define IDC_BUTTONREVERS                1037
 
 // Next default values for new objects
 // 

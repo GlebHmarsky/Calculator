@@ -64,6 +64,8 @@ BEGIN_MESSAGE_MAP(CCalculatorView, CFormView)
 	ON_BN_CLICKED(IDC_BUTTONCOS, &CCalculatorView::OnBnClickedButtoncos)
 	ON_BN_CLICKED(IDC_BUTTONABS, &CCalculatorView::OnBnClickedButtonabs)
 //	ON_EN_CHANGE(IDC_MEMORYFIELD, &CCalculatorView::OnEnChangeMemoryfield)
+ON_BN_CLICKED(IDC_BUTTONLG, &CCalculatorView::OnBnClickedButtonlg)
+ON_BN_CLICKED(IDC_BUTTONREVERS, &CCalculatorView::OnBnClickedButtonrevers)
 END_MESSAGE_MAP()
 
 // CCalculatorView construction/destruction
@@ -354,7 +356,8 @@ void CCalculatorView::OnBnClickedButtonclosingpar()
 }
 
 /*--------------------------УРАНЫЕ ОПЕРАЦИИ--------------------------*/
-/* Легенда унарных операторов:
+/*  Легенда унарных операторов:
+* 
 	* sqrt = s
 	* cos = c
 	* sin = x
@@ -365,7 +368,7 @@ void CCalculatorView::OnBnClickedButtonclosingpar()
 	*/
 
 bool IsUnaryOp(char a) {
-	if (a == 's' || a == 'c'|| a == 'x'|| a == 'a'|| a == 'l'|| a == 'n')
+	if (a == 's' || a == 'c'|| a == 'x'|| a == 'a'|| a == 'l'|| a == 'n'|| a == 'r')
 		return true;
 	return false;
 }
@@ -387,6 +390,19 @@ void CCalculatorView::OnBnClickedButtoncos()
 	// TODO: Add your control notification handler code here
 	AddUnToExpression('c');
 }
+
+void CCalculatorView::OnBnClickedButtonlg()
+{
+	// TODO: Add your control notification handler code here
+	AddUnToExpression('l');
+}
+
+void CCalculatorView::OnBnClickedButtonrevers()
+{
+	// TODO: Add your control notification handler code here
+	AddUnToExpression('r');
+}
+
 
 void CCalculatorView::OnBnClickedButtonabs()
 {
@@ -448,6 +464,7 @@ void CCalculatorView::AddUnToExpression(char op) {
 	}
 	OutToEdit(Head);
 	isItCalculate = false;
+	isNumberEmpty = true;
 }
 
 /*-------------------------------------РАБОТА СО СТЕКОМ И СПИСКОМ------------------------------------------*/
@@ -563,6 +580,9 @@ CString CCalculatorView::ConvertToString(char simbol) {
 		break;
 	case 'n':
 		tmp = "negate";
+		break;
+	case 'r':
+		tmp = "1/";
 		break;
 	default:
 		tmp.Format(L"%c", simbol);
@@ -756,6 +776,7 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 		if (b < 0) {
 			MessageBox(L"Корень от отрицательного числа невозможен");
 			isCalculateError = true;
+			return 1;
 		}
 		return sqrt(b);
 		break;
@@ -773,6 +794,14 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 		break;
 	case 'n':
 		return  -b;
+		break;
+	case 'r':
+		if (b == 0) {
+			MessageBox(L"Деление на ноль невозможно");
+			isCalculateError = true;
+			return 1;
+		}
+		return 1 / b;
 		break;
 	}
 
@@ -792,6 +821,7 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 		if (b == 0) {
 			MessageBox(L"Деление на ноль невозможно");
 			isCalculateError = true;
+			return 1;
 		}
 		return a / b;
 		break;
@@ -804,7 +834,7 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 	default:
 		break;
 	}
-
+	return 1;
 }
 
 /* Функция Prioritet возвpащает пpиоpитет аpифм. опеpации */
@@ -872,3 +902,6 @@ void CCalculatorView::OnBnClickedButtonbackspace()
 	
 	m_NumField.SetWindowTextW(str);	
 }
+
+
+
