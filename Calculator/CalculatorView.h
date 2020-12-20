@@ -53,6 +53,7 @@ public:
 	void AddUnToExpression(char);
 	void CloseAllBreakets();
 	double CalculateRPN(ExpOp**);
+	void OutToMemoryField();
 	CString ConvertToString(char);
 	CEdit m_EditBox;
 	CEdit m_NumField;
@@ -92,6 +93,7 @@ public:
 	afx_msg void OnBnClickedButtonabs();
 //	afx_msg void OnEnChangeMemoryfield();
 	CEdit m_MemoryField;
+	CStatic m_TextM;
 };
 
 #ifndef _DEBUG  // debug version in CalculatorView.cpp

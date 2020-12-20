@@ -85,6 +85,7 @@ void CCalculatorView::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT, m_EditBox);
 	DDX_Control(pDX, IDC_NUMBERFIELD, m_NumField);
 	DDX_Control(pDX, IDC_MEMORYFIELD, m_MemoryField);
+	DDX_Control(pDX, IDC_MEMORYM, m_TextM);
 }
 
 BOOL CCalculatorView::PreCreateWindow(CREATESTRUCT& cs)
@@ -360,6 +361,7 @@ void CCalculatorView::OnBnClickedButtonclosingpar()
 	* abs = a
 	* lg = l
 	* negate = n
+	* 1/x = r
 	*/
 
 bool IsUnaryOp(char a) {
@@ -593,6 +595,10 @@ void CCalculatorView::OutToNumField(double Result) {
 	m_NumField.SetWindowTextW(tmp);
 }
 
+void CCalculatorView::CloseAllBreakets() {
+	while (countBreckets)
+		OnBnClickedButtonclosingpar();
+}
 
 /*-------------------------------------  ПАМЯТЬ  ------------------------------------------*/
 
@@ -600,6 +606,8 @@ void CCalculatorView::OnBnClickedButtonmc()
 {
 	// TODO: Add your control notification handler code here
 	GetDocument()->mi->Mclear();
+	m_TextM.ShowWindow(SW_HIDE);
+	m_MemoryField.ShowWindow(SW_HIDE);
 }
 
 void CCalculatorView::OnBnClickedButtonmr()
@@ -607,7 +615,7 @@ void CCalculatorView::OnBnClickedButtonmr()
 	// TODO: Add your control notification handler code here
 	CString tmp;
 	tmp.Format(L"%g", GetDocument()->mi->Mread());
-	m_NumField.SetWindowTextW(tmp);
+	OutToMemoryField();
 	isNumberEmpty = true;
 }
 
@@ -616,6 +624,9 @@ void CCalculatorView::OnBnClickedButtonms()
 	// TODO: Add your control notification handler code here
 	m_NumField.GetWindowText(str);
 	GetDocument()->mi->Msave(_tstof(str));
+	m_TextM.ShowWindow(SW_SHOW);
+	OutToMemoryField();
+	m_MemoryField.ShowWindow(SW_SHOW);
 }
 
 void CCalculatorView::OnBnClickedButtonmplus()
@@ -623,6 +634,7 @@ void CCalculatorView::OnBnClickedButtonmplus()
 	// TODO: Add your control notification handler code here
 	m_NumField.GetWindowText(str);
 	GetDocument()->mi->Mplus(_tstof(str));
+	OutToMemoryField();
 }
 
 void CCalculatorView::OnBnClickedButtonmminus()
@@ -630,12 +642,13 @@ void CCalculatorView::OnBnClickedButtonmminus()
 	// TODO: Add your control notification handler code here
 	m_NumField.GetWindowText(str);
 	GetDocument()->mi->Mminus(_tstof(str));
+	OutToMemoryField();
 }
 
-void CCalculatorView::CloseAllBreakets() {
-	while (countBreckets) 
-		OnBnClickedButtonclosingpar();
-
+void CCalculatorView::OutToMemoryField() {
+	CString tmp;
+	tmp.Format(L"%g", GetDocument()->mi->Mread());
+	m_MemoryField.SetWindowTextW(tmp);
 }
 
 /*-------------------------------------  КАЛЬКУЛЯЦИИ  ------------------------------------------*/
