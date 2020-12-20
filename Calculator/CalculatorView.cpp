@@ -24,6 +24,8 @@
 #include "ExpOp.h"
 #include "MemoryItem.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
 // CCalculatorView
 
 IMPLEMENT_DYNCREATE(CCalculatorView, CFormView)
@@ -66,6 +68,7 @@ BEGIN_MESSAGE_MAP(CCalculatorView, CFormView)
 //	ON_EN_CHANGE(IDC_MEMORYFIELD, &CCalculatorView::OnEnChangeMemoryfield)
 ON_BN_CLICKED(IDC_BUTTONLG, &CCalculatorView::OnBnClickedButtonlg)
 ON_BN_CLICKED(IDC_BUTTONREVERS, &CCalculatorView::OnBnClickedButtonrevers)
+ON_BN_CLICKED(IDC_BUTTONFACTORIAL, &CCalculatorView::OnBnClickedButtonfactorial)
 END_MESSAGE_MAP()
 
 // CCalculatorView construction/destruction
@@ -257,6 +260,7 @@ void CCalculatorView::AddToNumField(LPCSTR num) {
 		m_NumField.SetWindowTextW(str + num);
 	}
 	isOperatorStand = false;
+	isItCalculate = false;
 }
 
 /*--------------------------БИНАРНЫЕ ОПЕРАЦИИ--------------------------*/
@@ -365,10 +369,11 @@ void CCalculatorView::OnBnClickedButtonclosingpar()
 	* lg = l
 	* negate = n
 	* 1/x = r
+	* factorial = f
 	*/
 
 bool IsUnaryOp(char a) {
-	if (a == 's' || a == 'c'|| a == 'x'|| a == 'a'|| a == 'l'|| a == 'n'|| a == 'r')
+	if (a == 's' || a == 'c'|| a == 'x'|| a == 'a'|| a == 'l'|| a == 'n'|| a == 'r'|| a == 'f')
 		return true;
 	return false;
 }
@@ -403,13 +408,17 @@ void CCalculatorView::OnBnClickedButtonrevers()
 	AddUnToExpression('r');
 }
 
+void CCalculatorView::OnBnClickedButtonfactorial()
+{
+	// TODO: Add your control notification handler code here
+	AddUnToExpression('f');
+}
 
 void CCalculatorView::OnBnClickedButtonabs()
 {
 	// TODO: Add your control notification handler code here
 	AddUnToExpression('a');
 }
-
 
 void CCalculatorView::OnBnClickedButtonplusminus()
 {
@@ -584,6 +593,9 @@ CString CCalculatorView::ConvertToString(char simbol) {
 	case 'r':
 		tmp = "1/";
 		break;
+	case 'f':
+		tmp = "factorial";
+		break;
 	default:
 		tmp.Format(L"%c", simbol);
 		break;
@@ -676,6 +688,7 @@ void CCalculatorView::OutToMemoryField() {
 void CCalculatorView::OnBnClickedButtonequal()
 {
 	// TODO: Add your control notification handler code here
+	if (isItCalculate) return;
 	CloseAllBreakets();
 	/*Добавить последние число в стек и жить поживать*/
 	m_NumField.GetWindowText(str);
@@ -685,13 +698,21 @@ void CCalculatorView::OnBnClickedButtonequal()
 	isNumberEmpty = true;
 	isOperatorStand = false;
 	isItCalculate = true;
-
+	isCalculateError = false;
 	RPN(Head);
 	//OutToEdit(OutRPN);
 	double result = CalculateRPN(&OutRPN);
 	if (!isCalculateError) {
 		OutToNumField(result);
 	}
+}
+
+long factorial(int num) {
+	long result = 1;
+	for (int i = num; i >= 1; i--) {
+		result *= i;
+	}
+	return result;
 }
 
 //Формирование обратной польской записи
@@ -794,6 +815,19 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 		break;
 	case 'n':
 		return  -b;
+		break;
+	case 'f':
+		if (b < 0) {
+			MessageBox(L"Факториал от отрицательного числа невозможен");
+			isCalculateError = true;
+			return 1;
+		}
+		if (b > 19) {
+			MessageBox(L"Факториал больших чисел невозможен");
+			isCalculateError = true;
+			return 1;
+		}
+		return  factorial((int)b);
 		break;
 	case 'r':
 		if (b == 0) {
@@ -902,6 +936,5 @@ void CCalculatorView::OnBnClickedButtonbackspace()
 	
 	m_NumField.SetWindowTextW(str);	
 }
-
 
 

@@ -96,6 +96,7 @@ public:
 	CStatic m_TextM;
 	afx_msg void OnBnClickedButtonlg();
 	afx_msg void OnBnClickedButtonrevers();
+	afx_msg void OnBnClickedButtonfactorial();
 };
 
 #ifndef _DEBUG  // debug version in CalculatorView.cpp
