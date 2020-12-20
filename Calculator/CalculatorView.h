@@ -47,10 +47,13 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	void OutToEdit(ExpOp*);
-	void OutToEdit(double);
+	void OutToNumField(double);
 	void AddToNumField(LPCSTR);
 	void AddToExpression(char);
+	void AddUnToExpression(char);
 	void CloseAllBreakets();
+	double CalculateRPN(ExpOp**);
+	CString ConvertToString(char);
 	CEdit m_EditBox;
 	CEdit m_NumField;
 	afx_msg void OnBnClickedButton1();
@@ -82,6 +85,13 @@ public:
 	afx_msg void OnBnClickedButtonpow();
 	afx_msg void OnBnClickedButtonsqrt();
 	afx_msg void OnBnClickedButtonbackspace();
+	afx_msg void OnBnClickedButtonmod();
+	afx_msg void OnBnClickedButtonplusminus();
+	afx_msg void OnBnClickedButtonsin();
+	afx_msg void OnBnClickedButtoncos();
+	afx_msg void OnBnClickedButtonabs();
+//	afx_msg void OnEnChangeMemoryfield();
+	CEdit m_MemoryField;
 };
 
 #ifndef _DEBUG  // debug version in CalculatorView.cpp

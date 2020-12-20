@@ -75,8 +75,9 @@ void CCalculatorDoc::Serialize(CArchive& ar)
 
 void MemoryItem::Serialize(CArchive& ar)
 {
-	if (ar.IsStoring())
+	if (ar.IsStoring()) {
 		ar << info;
+	}
 	else
 		ar >> info;
 }

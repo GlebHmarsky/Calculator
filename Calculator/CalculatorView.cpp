@@ -58,6 +58,12 @@ BEGIN_MESSAGE_MAP(CCalculatorView, CFormView)
 	ON_BN_CLICKED(IDC_BUTTONPOW, &CCalculatorView::OnBnClickedButtonpow)
 	ON_BN_CLICKED(IDC_BUTTONSQRT, &CCalculatorView::OnBnClickedButtonsqrt)
 	ON_BN_CLICKED(IDC_BUTTONBACKSPACE, &CCalculatorView::OnBnClickedButtonbackspace)
+	ON_BN_CLICKED(IDC_BUTTONMOD, &CCalculatorView::OnBnClickedButtonmod)
+	ON_BN_CLICKED(IDC_BUTTONPLUSMINUS, &CCalculatorView::OnBnClickedButtonplusminus)
+	ON_BN_CLICKED(IDC_BUTTONSIN, &CCalculatorView::OnBnClickedButtonsin)
+	ON_BN_CLICKED(IDC_BUTTONCOS, &CCalculatorView::OnBnClickedButtoncos)
+	ON_BN_CLICKED(IDC_BUTTONABS, &CCalculatorView::OnBnClickedButtonabs)
+//	ON_EN_CHANGE(IDC_MEMORYFIELD, &CCalculatorView::OnEnChangeMemoryfield)
 END_MESSAGE_MAP()
 
 // CCalculatorView construction/destruction
@@ -78,6 +84,7 @@ void CCalculatorView::DoDataExchange(CDataExchange* pDX)
 	CFormView::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_EDIT, m_EditBox);
 	DDX_Control(pDX, IDC_NUMBERFIELD, m_NumField);
+	DDX_Control(pDX, IDC_MEMORYFIELD, m_MemoryField);
 }
 
 BOOL CCalculatorView::PreCreateWindow(CREATESTRUCT& cs)
@@ -139,6 +146,9 @@ bool CommaIsStands = false; //Отвечает за то, что точка в �
 bool isNumberEmpty = true; //Отвечает за то, что число ещё не было написано (используется старое значение)
 bool isOperatorStand = false; //Отвечает за то, что поставлен бинарный оператор (который в случае нужно заменить)
 bool isItCalculate = false;
+bool isCalculateError = false; //true - Если была недопустимое выражение в операции
+
+/*--------------------------ЧИСЛА--------------------------*/
 
 void CCalculatorView::OnBnClickedButton1()
 {
@@ -232,6 +242,9 @@ void CCalculatorView::OnBnClickedButtoncomma()
 
 //Добавление цифры к строке числа
 void CCalculatorView::AddToNumField(LPCSTR num) {
+	if (isItCalculate)
+		OnBnClickedButtonclearall();
+
 	m_NumField.GetWindowText(str);
 	if (str == L"0" || isNumberEmpty) {
 		m_NumField.SetWindowTextW(((LPCTSTR)num));
@@ -243,6 +256,7 @@ void CCalculatorView::AddToNumField(LPCSTR num) {
 	isOperatorStand = false;
 }
 
+/*--------------------------БИНАРНЫЕ ОПЕРАЦИИ--------------------------*/
 
 void CCalculatorView::OnBnClickedButtonplus()
 {
@@ -274,34 +288,15 @@ void CCalculatorView::OnBnClickedButtonpow()
 	AddToExpression('^');
 }
 
-void CCalculatorView::OnBnClickedButtonsqrt()
+void CCalculatorView::OnBnClickedButtonmod()
 {
 	// TODO: Add your control notification handler code here
-	if (isCloseBrLast) {
-		ExpOp* t = GoBackToOpenBr(&(Head->prev));
-		if (IsUnaryOp(t->GetOp())) {
-			InsertTo(new ExpOp('('), &(t), &Head);
-			countBreckets++;
-			OnBnClickedButtonclosingpar();
-			t = t->prev;
-		}
-		InsertTo(new ExpOp('s'), &(t), &Head);
-	}
-	// Если скобка последний символ не закрывающая скобка
-	else {
-		OnBnClickedButtonopeningpar();
-		OnBnClickedButtonclosingpar();
-
-		ExpOp* t = GoBackToOpenBr(&(Head->prev));
-		InsertTo(new ExpOp('s'), &(t), &Head);
-	}
-	OutToEdit(Head);
+	AddToExpression('%');
 }
-
-
 //Добавление оператора к строке числа
 void CCalculatorView::AddToExpression(char op)
 {
+
 	m_NumField.GetWindowText(str);
 	if (!isOperatorStand) {
 		if(!isItCalculate && !isCloseBrLast) Push(new ExpOp(_tstof(str)), &Head);
@@ -317,6 +312,7 @@ void CCalculatorView::AddToExpression(char op)
 	OutToEdit(Head);
 	//isOpenBrStand = false;
 	isCloseBrLast = false;
+	isItCalculate = false;
 }
 
 /*  Скобки  */
@@ -356,12 +352,103 @@ void CCalculatorView::OnBnClickedButtonclosingpar()
 	isCloseBrLast = true;
 }
 
+/*--------------------------УРАНЫЕ ОПЕРАЦИИ--------------------------*/
+/* Легенда унарных операторов:
+	* sqrt = s
+	* cos = c
+	* sin = x
+	* abs = a
+	* lg = l
+	* negate = n
+	*/
+
 bool IsUnaryOp(char a) {
-	if (a == 's')
+	if (a == 's' || a == 'c'|| a == 'x'|| a == 'a'|| a == 'l'|| a == 'n')
 		return true;
 	return false;
 }
-/*-------------------------------------------------------------------------------*/
+
+void CCalculatorView::OnBnClickedButtonsqrt()
+{
+	// TODO: Add your control notification handler code here
+	AddUnToExpression('s');
+}
+
+void CCalculatorView::OnBnClickedButtonsin()
+{
+	// TODO: Add your control notification handler code here
+	AddUnToExpression('x');
+}
+
+void CCalculatorView::OnBnClickedButtoncos()
+{
+	// TODO: Add your control notification handler code here
+	AddUnToExpression('c');
+}
+
+void CCalculatorView::OnBnClickedButtonabs()
+{
+	// TODO: Add your control notification handler code here
+	AddUnToExpression('a');
+}
+
+
+void CCalculatorView::OnBnClickedButtonplusminus()
+{
+	// TODO: Add your control notification handler code here
+	// Меняем всё выражение Если получено равенство или последняя стоит скобка
+	if(Head)
+		if (Head->prev->GetOp() == ')') {
+			AddUnToExpression('n');
+			return;
+		}
+
+	if (isItCalculate) {
+		AddUnToExpression('n');
+	}
+	// Меняем только поле numfield
+	else {
+		m_NumField.GetWindowText(str);
+		if (str == "0") return;
+
+		if (str.GetAt(0) == '-') {
+			str.Delete(0);
+			m_NumField.SetWindowTextW(str);
+		}
+		else {
+			m_NumField.SetWindowTextW('-' + str);
+		}
+	}
+}
+
+
+void CCalculatorView::AddUnToExpression(char op) {
+	if (isItCalculate)
+		OnBnClickedButtonclearall();
+
+	if (isCloseBrLast) {
+		ExpOp* t = GoBackToOpenBr(&(Head->prev));
+		if (IsUnaryOp(t->GetOp())) {
+			InsertTo(new ExpOp('('), &(t), &Head);
+			countBreckets++;
+			OnBnClickedButtonclosingpar();
+			t = t->prev;
+		}
+		InsertTo(new ExpOp(op), &(t), &Head);
+	}
+	// Если скобка последний символ не закрывающая скобка
+	else {
+		OnBnClickedButtonopeningpar();
+		OnBnClickedButtonclosingpar();
+
+		ExpOp* t = GoBackToOpenBr(&(Head->prev));
+		InsertTo(new ExpOp(op), &(t), &Head);
+	}
+	OutToEdit(Head);
+	isItCalculate = false;
+}
+
+/*-------------------------------------РАБОТА СО СТЕКОМ И СПИСКОМ------------------------------------------*/
 
 
 void Push(ExpOp *el, ExpOp **HEAD) {
@@ -454,6 +541,35 @@ ExpOp* GoBackToOpenBr(ExpOp** From) {
 	return NULL;
 }
 
+CString CCalculatorView::ConvertToString(char simbol) {
+	CString tmp;
+	switch (simbol) {
+	case 's':
+		tmp = "sqrt";
+		break;
+	case 'c':
+		tmp = "cos";
+		break;
+	case 'x':
+		tmp = "sin";
+		break;
+	case 'a':
+		tmp = "abs";
+		break;
+	case 'l':
+		tmp = "lg";
+		break;
+	case 'n':
+		tmp = "negate";
+		break;
+	default:
+		tmp.Format(L"%c", simbol);
+		break;
+	}
+	return tmp;
+
+}
+
 void CCalculatorView::OutToEdit(ExpOp* HEAD) {
 	str = "";
 	CString tmp;
@@ -465,21 +581,20 @@ void CCalculatorView::OutToEdit(ExpOp* HEAD) {
 			str.Append(tmp);
 		}
 		else{
-			tmp.Format(L"%c", tp->GetOp());
-			str.Append(tmp);
+			str.Append(ConvertToString(tp->GetOp()));
 		}
 	}
 	m_EditBox.SetWindowTextW(str);
 }
 
-void CCalculatorView::OutToEdit(double Result) {
+void CCalculatorView::OutToNumField(double Result) {
 	CString tmp;
 	tmp.Format(L"%g", Result);
 	m_NumField.SetWindowTextW(tmp);
 }
 
 
-/*-------------------------------------------------------------------------------*/
+/*-------------------------------------  ПАМЯТЬ  ------------------------------------------*/
 
 void CCalculatorView::OnBnClickedButtonmc()
 {
@@ -523,6 +638,8 @@ void CCalculatorView::CloseAllBreakets() {
 
 }
 
+/*-------------------------------------  КАЛЬКУЛЯЦИИ  ------------------------------------------*/
+
 void CCalculatorView::OnBnClickedButtonequal()
 {
 	// TODO: Add your control notification handler code here
@@ -538,8 +655,10 @@ void CCalculatorView::OnBnClickedButtonequal()
 
 	RPN(Head);
 	//OutToEdit(OutRPN);
-	OutToEdit(CalculateRPN(&OutRPN));
-	
+	double result = CalculateRPN(&OutRPN);
+	if (!isCalculateError) {
+		OutToNumField(result);
+	}
 }
 
 //Формирование обратной польской записи
@@ -569,7 +688,7 @@ void RPN(ExpOp* HEAD) {
 		if (tp->GetOp() == '(') 
 			PushBack(new ExpOp(tp), &OpList);
 
-		if (tp->GetOp() == '+' || tp->GetOp() == '-' || tp->GetOp() == '/' || tp->GetOp() == '*'|| tp->GetOp() == '^')
+		if (tp->GetOp() == '+' || tp->GetOp() == '-' || tp->GetOp() == '/' || tp->GetOp() == '*'|| tp->GetOp() == '^'|| tp->GetOp() == '%')
 		{
 			if (!OpList) {
 				PushBack(new ExpOp(tp), &OpList);
@@ -592,7 +711,7 @@ void RPN(ExpOp* HEAD) {
 			}
 		}
 		/* Если унарная операция */
-		if (tp->GetOp() == 's' )
+		if (IsUnaryOp(tp->GetOp()))
 		{
 			PushBack(new ExpOp(tp), &UnOpList);
 		}
@@ -607,7 +726,7 @@ void RPN(ExpOp* HEAD) {
 		PushBack(Pull(&UnOpList), &OutRPN);
 }
 
-double CalculateRPN(ExpOp** hRPN) {
+double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 	ExpOp* el = Pull(hRPN);
 
 	//Если элемент число - то возвращаем его
@@ -621,10 +740,28 @@ double CalculateRPN(ExpOp** hRPN) {
 	switch (el->GetOp())
 	{
 	case 's':
+		if (b < 0) {
+			MessageBox(L"Корень от отрицательного числа невозможен");
+			isCalculateError = true;
+		}
 		return sqrt(b);
 		break;
+	case 'x':
+		return  sin(b);
+		break;
+	case 'c':
+		return  cos(b);
+		break;
+	case 'a':
+		return  abs(b);
+		break;
+	case 'l':
+		return  log10(b);
+		break;
+	case 'n':
+		return  -b;
+		break;
 	}
-
 
 	a = CalculateRPN(hRPN);
 	switch (el->GetOp())
@@ -639,10 +776,17 @@ double CalculateRPN(ExpOp** hRPN) {
 		return a * b;
 		break;
 	case '/':
+		if (b == 0) {
+			MessageBox(L"Деление на ноль невозможно");
+			isCalculateError = true;
+		}
 		return a / b;
 		break;
 	case '^':
 		return pow(a,b);
+		break;
+	case '%':
+		return remainder(a,b);
 		break;
 	default:
 		break;
@@ -685,23 +829,33 @@ void CCalculatorView::OnPaint()
 
 void CCalculatorView::OnBnClickedButtonclearall()
 {
-	// TODO: Add your control notification handler code here
+	if(!Head) //Если список операций пуст, то очишаем и строку с числом
+		m_NumField.SetWindowTextW(L"0");
+
 	ClearList(&Head);
 	ClearList(&OutRPN);
 	countBreckets = 0;
 	isOpenBrStand = false;
 	isCloseBrLast = false;
-	CommaIsStands = false; //Отвечает за то, что точка в числе уже стоит. 
-	isNumberEmpty = true; //Отвечает за то, что число ещё не было написано (используется старое значение)
-	isOperatorStand = false; //Отвечает за то, что поставлен бинарный оператор (который в случае нужно заменить)
+	CommaIsStands = false; 
+	isNumberEmpty = true; 
+	isOperatorStand = false;
 	isItCalculate = false;
 
 	OutToEdit(Head);
-	m_NumField.SetWindowTextW(L"0");
 }
 
 void CCalculatorView::OnBnClickedButtonbackspace()
 {
 	// TODO: Add your control notification handler code here
-
+	m_NumField.GetWindowText(str);
+	if (isItCalculate) return;
+	if (str.GetLength() > 1) {
+		str.Delete(str.GetLength()-1, 1);
+	}
+	else {
+		str = "0";
+	}
+	
+	m_NumField.SetWindowTextW(str);	
 }

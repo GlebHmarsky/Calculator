@@ -44,8 +44,13 @@
 #define IDC_BUTTONMOD                   1027
 #define IDC_BUTTONPLUSMINUS             1028
 #define IDC_BUTTONSQRT                  1029
-#define IDC_BUTTONCLEARALL2             1030
 #define IDC_BUTTONBACKSPACE             1030
+#define IDC_BUTTONCOS                   1031
+#define IDC_BUTTONABS                   1032
+#define IDC_BUTTONSIN                   1033
+#define IDC_BUTTONLG                    1034
+#define IDC_EDIT1                       1035
+#define IDC_MEMORYFIELD                 1035
 
 // Next default values for new objects
 // 
@@ -53,7 +58,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        311
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1030
+#define _APS_NEXT_CONTROL_VALUE         1036
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif
