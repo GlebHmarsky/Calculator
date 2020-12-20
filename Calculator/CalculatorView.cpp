@@ -216,8 +216,10 @@ void CCalculatorView::OnBnClickedButton9()
 }
 
 void CCalculatorView::OnBnClickedButton0()
-{
-	// TODO: Add your control notification handler code here
+{	
+	if (isItCalculate)
+		OnBnClickedButtonclearall();
+	
 	if (isNumberEmpty) {
 		m_NumField.SetWindowTextW(L"0");
 		isNumberEmpty = false;
@@ -232,6 +234,7 @@ void CCalculatorView::OnBnClickedButton0()
 		}
 	}
 	isOperatorStand = false;
+	isItCalculate = false;
 }
 
 void CCalculatorView::OnBnClickedButtoncomma()
@@ -382,10 +385,14 @@ void CCalculatorView::OnBnClickedButtonclosingpar()
 	* negate = n
 	* 1/x = r
 	* fact = f
+	* ln = e
+	* 10^ = t
+	* ctan = g
+	* tan = h
 	*/
 
 bool IsUnaryOp(char a) {
-	if (a == 's' || a == 'c'|| a == 'x'|| a == 'a'|| a == 'l'|| a == 'n'|| a == 'r'|| a == 'f')
+	if (a == 's' || a == 'c'|| a == 'x'|| a == 'a'|| a == 'l'|| a == 'n'|| a == 'r'|| a == 'f'|| a == 'e'|| a == 't'|| a == 'g'|| a == 'h')
 		return true;
 	return false;
 }
@@ -463,26 +470,26 @@ void CCalculatorView::OnBnClickedButtonplusminus()
 void CCalculatorView::OnBnClickedButtonln()
 {
 	// TODO: Add your control notification handler code here
+	AddUnToExpression('e');
 }
-
 
 void CCalculatorView::OnBnClickedButtontenpow()
 {
 	// TODO: Add your control notification handler code here
+	AddUnToExpression('t');
 }
-
 
 void CCalculatorView::OnBnClickedButtonctan()
 {
 	// TODO: Add your control notification handler code here
+	AddUnToExpression('g');
 }
-
 
 void CCalculatorView::OnBnClickedButtontan()
 {
 	// TODO: Add your control notification handler code here
+	AddUnToExpression('h');
 }
-
 
 
 void CCalculatorView::AddUnToExpression(char op) {
@@ -634,6 +641,18 @@ CString CCalculatorView::ConvertToString(char simbol) {
 		break;
 	case 'k':
 		tmp = " log base ";
+		break;
+	case 'e':
+		tmp = "ln";
+		break;
+	case 't':
+		tmp = "10^";
+		break;
+	case 'g':
+		tmp = "cotan";
+		break;
+	case 'h':
+		tmp = "tan";
 		break;
 	default:
 		tmp.Format(L"%c", simbol);
@@ -849,7 +868,24 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 	case 'a':
 		return  abs(b);
 		break;
+	case 'e':
+		return  log(b);
+		break;
+	case 't':
+		return  pow(10,b);
+		break;
+	case 'h':
+		return	tan(b);
+		break;
+	case 'g':
+		return  1/tan(b);
+		break;
 	case 'l':
+		if (b <= 0) {
+			MessageBox(L"Факториал от отрицательного числа невозможен");
+			isCalculateError = true;
+			return 1;
+		}
 		return  log10(b);
 		break;
 	case 'n':
@@ -902,14 +938,30 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 		return pow(a,b);
 		break;
 	case '%':
-		return remainder(a,b);
+		if (b == 0) {
+			MessageBox(L"Деление на ноль невозможно");
+			isCalculateError = true;
+			return 1;
+		}
+		if (b < 0) {
+			return remainder(a, b);
+		}
+		else {
+			return fmod(a, b);
+		}		
 		break;
 	case 'k':
+		if (b <= 0 || a <= 0 || b == 1) {
+			MessageBox(L"Недоступные аргументы логарифма");
+			isCalculateError = true;
+			return 1;
+		}
 		return log(a) / log(b);
 		break;
 	default:
 		break;
 	}
+	
 	return 1;
 }
 
