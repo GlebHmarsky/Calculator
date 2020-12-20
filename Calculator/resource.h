@@ -58,6 +58,9 @@
 #define IDC_BUTTONTENPOW                1041
 #define IDC_BUTTONLN                    1042
 #define IDC_BUTTONXLOGY                 1043
+#define IDC_BUTTONLN2                   1044
+#define IDC_BUTTONE                     1044
+#define IDC_BUTTONPI                    1045
 #define ID_EDIT_COPY32771               32771
 #define ID_EDIT_PASTE32772              32772
 

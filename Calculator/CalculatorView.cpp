@@ -75,6 +75,8 @@ ON_BN_CLICKED(IDC_BUTTONCTAN, &CCalculatorView::OnBnClickedButtonctan)
 ON_BN_CLICKED(IDC_BUTTONTAN, &CCalculatorView::OnBnClickedButtontan)
 ON_COMMAND(ID_EDIT_COPY, &CCalculatorView::OnEditCopy)
 ON_COMMAND(ID_EDIT_PASTE, &CCalculatorView::OnEditPaste)
+ON_BN_CLICKED(IDC_BUTTONPI, &CCalculatorView::OnBnClickedButtonpi)
+ON_BN_CLICKED(IDC_BUTTONE, &CCalculatorView::OnBnClickedButtone)
 END_MESSAGE_MAP()
 
 // CCalculatorView construction/destruction
@@ -159,6 +161,25 @@ bool isNumberEmpty = true; //Отвечает за то, что число ещ�
 bool isOperatorStand = false; //Отвечает за то, что поставлен бинарный оператор (который в случае нужно заменить)
 bool isItCalculate = false;
 bool isCalculateError = false; //true - Если была недопустимое выражение в операции
+
+/*--------------------------КОНСТАНТЫ--------------------------*/
+
+void CCalculatorView::OnBnClickedButtonpi()
+{
+	CString tmp;
+	tmp.Format(L"%g", M_PI);
+	m_NumField.SetWindowTextW(tmp);
+	isNumberEmpty = true;
+}
+
+
+void CCalculatorView::OnBnClickedButtone()
+{
+	CString tmp;
+	tmp.Format(L"%g", M_E);
+	m_NumField.SetWindowTextW(tmp);
+	isNumberEmpty = true;
+}
 
 /*--------------------------ЧИСЛА--------------------------*/
 
@@ -1034,14 +1055,12 @@ void CCalculatorView::OnBnClickedButtonbackspace()
 	m_NumField.SetWindowTextW(str);	
 }
 
-
 void CCalculatorView::OnEditCopy()
 {
 	// TODO: Add your command handler code here
 	m_NumField.SetSel(0, m_NumField.GetWindowTextLengthW());
 	m_NumField.Copy();
 }
-
 
 void CCalculatorView::OnEditPaste()
 {
