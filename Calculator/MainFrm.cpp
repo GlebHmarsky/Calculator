@@ -17,6 +17,7 @@
 IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
+
 END_MESSAGE_MAP()
 
 // CMainFrame construction/destruction
@@ -56,4 +57,3 @@ void CMainFrame::Dump(CDumpContext& dc) const
 
 
 // CMainFrame message handlers
-

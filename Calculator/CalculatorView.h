@@ -97,6 +97,13 @@ public:
 	afx_msg void OnBnClickedButtonlg();
 	afx_msg void OnBnClickedButtonrevers();
 	afx_msg void OnBnClickedButtonfactorial();
+//	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+//	afx_msg void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnBnClickedButtonxlogy();
+	afx_msg void OnBnClickedButtonln();
+	afx_msg void OnBnClickedButtontenpow();
+	afx_msg void OnBnClickedButtonctan();
+	afx_msg void OnBnClickedButtontan();
 };
 
 #ifndef _DEBUG  // debug version in CalculatorView.cpp

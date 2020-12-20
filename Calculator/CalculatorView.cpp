@@ -65,10 +65,14 @@ BEGIN_MESSAGE_MAP(CCalculatorView, CFormView)
 	ON_BN_CLICKED(IDC_BUTTONSIN, &CCalculatorView::OnBnClickedButtonsin)
 	ON_BN_CLICKED(IDC_BUTTONCOS, &CCalculatorView::OnBnClickedButtoncos)
 	ON_BN_CLICKED(IDC_BUTTONABS, &CCalculatorView::OnBnClickedButtonabs)
-//	ON_EN_CHANGE(IDC_MEMORYFIELD, &CCalculatorView::OnEnChangeMemoryfield)
 ON_BN_CLICKED(IDC_BUTTONLG, &CCalculatorView::OnBnClickedButtonlg)
 ON_BN_CLICKED(IDC_BUTTONREVERS, &CCalculatorView::OnBnClickedButtonrevers)
 ON_BN_CLICKED(IDC_BUTTONFACTORIAL, &CCalculatorView::OnBnClickedButtonfactorial)
+ON_BN_CLICKED(IDC_BUTTONXLOGY, &CCalculatorView::OnBnClickedButtonxlogy)
+ON_BN_CLICKED(IDC_BUTTONLN, &CCalculatorView::OnBnClickedButtonln)
+ON_BN_CLICKED(IDC_BUTTONTENPOW, &CCalculatorView::OnBnClickedButtontenpow)
+ON_BN_CLICKED(IDC_BUTTONCTAN, &CCalculatorView::OnBnClickedButtonctan)
+ON_BN_CLICKED(IDC_BUTTONTAN, &CCalculatorView::OnBnClickedButtontan)
 END_MESSAGE_MAP()
 
 // CCalculatorView construction/destruction
@@ -300,6 +304,14 @@ void CCalculatorView::OnBnClickedButtonmod()
 	// TODO: Add your control notification handler code here
 	AddToExpression('%');
 }
+
+void CCalculatorView::OnBnClickedButtonxlogy()
+{
+	// TODO: Add your control notification handler code here
+	AddToExpression('k');
+}
+
+
 //Добавление оператора к строке числа
 void CCalculatorView::AddToExpression(char op)
 {
@@ -369,7 +381,7 @@ void CCalculatorView::OnBnClickedButtonclosingpar()
 	* lg = l
 	* negate = n
 	* 1/x = r
-	* factorial = f
+	* fact = f
 	*/
 
 bool IsUnaryOp(char a) {
@@ -447,6 +459,30 @@ void CCalculatorView::OnBnClickedButtonplusminus()
 		}
 	}
 }
+
+void CCalculatorView::OnBnClickedButtonln()
+{
+	// TODO: Add your control notification handler code here
+}
+
+
+void CCalculatorView::OnBnClickedButtontenpow()
+{
+	// TODO: Add your control notification handler code here
+}
+
+
+void CCalculatorView::OnBnClickedButtonctan()
+{
+	// TODO: Add your control notification handler code here
+}
+
+
+void CCalculatorView::OnBnClickedButtontan()
+{
+	// TODO: Add your control notification handler code here
+}
+
 
 
 void CCalculatorView::AddUnToExpression(char op) {
@@ -594,7 +630,10 @@ CString CCalculatorView::ConvertToString(char simbol) {
 		tmp = "1/";
 		break;
 	case 'f':
-		tmp = "factorial";
+		tmp = "fact";
+		break;
+	case 'k':
+		tmp = " log base ";
 		break;
 	default:
 		tmp.Format(L"%c", simbol);
@@ -742,7 +781,7 @@ void RPN(ExpOp* HEAD) {
 		if (tp->GetOp() == '(') 
 			PushBack(new ExpOp(tp), &OpList);
 
-		if (tp->GetOp() == '+' || tp->GetOp() == '-' || tp->GetOp() == '/' || tp->GetOp() == '*'|| tp->GetOp() == '^'|| tp->GetOp() == '%')
+		if (tp->GetOp() == '+' || tp->GetOp() == '-' || tp->GetOp() == '/' || tp->GetOp() == '*'|| tp->GetOp() == '^'|| tp->GetOp() == '%'|| tp->GetOp() == 'k')
 		{
 			if (!OpList) {
 				PushBack(new ExpOp(tp), &OpList);
@@ -822,7 +861,7 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 			isCalculateError = true;
 			return 1;
 		}
-		if (b > 19) {
+		if (b > 12) {
 			MessageBox(L"Факториал больших чисел невозможен");
 			isCalculateError = true;
 			return 1;
@@ -864,6 +903,9 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 		break;
 	case '%':
 		return remainder(a,b);
+		break;
+	case 'k':
+		return log(a) / log(b);
 		break;
 	default:
 		break;
@@ -928,7 +970,8 @@ void CCalculatorView::OnBnClickedButtonbackspace()
 	m_NumField.GetWindowText(str);
 	if (isItCalculate) return;
 	if (str.GetLength() > 1) {
-		str.Delete(str.GetLength()-1, 1);
+		if(str.GetAt(str.GetLength()-1) == '.') CommaIsStands = true;
+		str.Delete(str.GetLength()-1);
 	}
 	else {
 		str = "0";
