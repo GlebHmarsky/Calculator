@@ -58,13 +58,15 @@
 #define IDC_BUTTONTENPOW                1041
 #define IDC_BUTTONLN                    1042
 #define IDC_BUTTONXLOGY                 1043
+#define ID_EDIT_COPY32771               32771
+#define ID_EDIT_PASTE32772              32772
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        311
-#define _APS_NEXT_COMMAND_VALUE         32771
+#define _APS_NEXT_COMMAND_VALUE         32773
 #define _APS_NEXT_CONTROL_VALUE         1037
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

@@ -73,6 +73,8 @@ ON_BN_CLICKED(IDC_BUTTONLN, &CCalculatorView::OnBnClickedButtonln)
 ON_BN_CLICKED(IDC_BUTTONTENPOW, &CCalculatorView::OnBnClickedButtontenpow)
 ON_BN_CLICKED(IDC_BUTTONCTAN, &CCalculatorView::OnBnClickedButtonctan)
 ON_BN_CLICKED(IDC_BUTTONTAN, &CCalculatorView::OnBnClickedButtontan)
+ON_COMMAND(ID_EDIT_COPY, &CCalculatorView::OnEditCopy)
+ON_COMMAND(ID_EDIT_PASTE, &CCalculatorView::OnEditPaste)
 END_MESSAGE_MAP()
 
 // CCalculatorView construction/destruction
@@ -1033,3 +1035,19 @@ void CCalculatorView::OnBnClickedButtonbackspace()
 }
 
 
+void CCalculatorView::OnEditCopy()
+{
+	// TODO: Add your command handler code here
+	m_NumField.SetSel(0, m_NumField.GetWindowTextLengthW());
+	m_NumField.Copy();
+}
+
+
+void CCalculatorView::OnEditPaste()
+{
+	// TODO: Add your command handler code here
+	m_NumField.SetWindowTextW(L"");
+	m_NumField.SetReadOnly(false);
+	m_NumField.Paste();
+	m_NumField.SetReadOnly(true);
+}
