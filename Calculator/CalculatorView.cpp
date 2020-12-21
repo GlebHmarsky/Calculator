@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string>
 #include <iostream>
+#include <algorithm>    // std::all_of
 #include "ExpOp.h"
 #include "MemoryItem.h"
 
@@ -1060,6 +1061,15 @@ void CCalculatorView::OnEditPaste()
 	m_NumField.SetWindowTextW(L"");
 	m_NumField.SetReadOnly(false);
 	m_NumField.Paste();
+	m_NumField.GetWindowText(str);
+	// Convert a TCHAR string to a LPCSTR
+	CT2CA pszConvertedAnsiString(str);
+	// construct a std::string using the LPCSTR input
+	std::string tmpstr(pszConvertedAnsiString);
+	// Если есть другие символы кроме числел.
+	if (!std::all_of(tmpstr.begin(), tmpstr.end(), [](int i) { return (i == '.' || ::isdigit(i)); } )) 
+		m_NumField.SetWindowTextW(L"0");		
+	
 	m_NumField.SetReadOnly(true);
 }
 
