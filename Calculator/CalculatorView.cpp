@@ -398,8 +398,7 @@ void CCalculatorView::OnBnClickedButtonclosingpar()
 }
 
 /*--------------------------УРАНЫЕ ОПЕРАЦИИ--------------------------*/
-/*  Легенда унарных операторов:
-* 
+/*  Легенда унарных операторов: 
 	* sqrt = s
 	* cos = c
 	* sin = x
@@ -990,12 +989,16 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 
 /* Функция Prioritet возвpащает пpиоpитет аpифм. опеpации */
 int Prioritet(char a){
+	
 	switch (a)
 	{
+	case 'k':
+		return 5;
 	case '^':
 		return 4;
 	case '*':
 	case '/':
+	case '%':
 		return 3;
 
 	case '-':
