@@ -9,6 +9,17 @@ class CCalculatorView : public CFormView
 {
 public: 
 	CString str;
+	ExpOp* Head = NULL;
+	ExpOp* OutRPN = NULL;
+
+	int countBreckets = 0;
+	bool isOpenBrStand = false;
+	bool isCloseBrLast = false;
+	bool CommaIsStands = false; //ќтвечает за то, что точка в числе уже стоит. 
+	bool isNumberEmpty = true; //ќтвечает за то, что число ещЄ не было написано (используетс€ старое значение)
+	bool isOperatorStand = false; //ќтвечает за то, что поставлен бинарный оператор (который в случае нужно заменить)
+	bool isItCalculate = false;
+	bool isCalculateError = false; //true - ≈сли была недопустимое выражение в операции
 protected: // create from serialization only
 	CCalculatorView() noexcept;
 	DECLARE_DYNCREATE(CCalculatorView)
@@ -46,6 +57,9 @@ protected:
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
+
+
+	void RPN(ExpOp*);
 	void OutToEdit(ExpOp*);
 	void OutToNumField(double);
 	void AddToNumField(LPCSTR);
@@ -91,14 +105,11 @@ public:
 	afx_msg void OnBnClickedButtonsin();
 	afx_msg void OnBnClickedButtoncos();
 	afx_msg void OnBnClickedButtonabs();
-//	afx_msg void OnEnChangeMemoryfield();
 	CEdit m_MemoryField;
 	CStatic m_TextM;
 	afx_msg void OnBnClickedButtonlg();
 	afx_msg void OnBnClickedButtonrevers();
 	afx_msg void OnBnClickedButtonfactorial();
-//	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-//	afx_msg void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnBnClickedButtonxlogy();
 	afx_msg void OnBnClickedButtonln();
 	afx_msg void OnBnClickedButtontenpow();

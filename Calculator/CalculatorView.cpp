@@ -65,20 +65,20 @@ BEGIN_MESSAGE_MAP(CCalculatorView, CFormView)
 	ON_BN_CLICKED(IDC_BUTTONSIN, &CCalculatorView::OnBnClickedButtonsin)
 	ON_BN_CLICKED(IDC_BUTTONCOS, &CCalculatorView::OnBnClickedButtoncos)
 	ON_BN_CLICKED(IDC_BUTTONABS, &CCalculatorView::OnBnClickedButtonabs)
-ON_BN_CLICKED(IDC_BUTTONLG, &CCalculatorView::OnBnClickedButtonlg)
-ON_BN_CLICKED(IDC_BUTTONREVERS, &CCalculatorView::OnBnClickedButtonrevers)
-ON_BN_CLICKED(IDC_BUTTONFACTORIAL, &CCalculatorView::OnBnClickedButtonfactorial)
-ON_BN_CLICKED(IDC_BUTTONXLOGY, &CCalculatorView::OnBnClickedButtonxlogy)
-ON_BN_CLICKED(IDC_BUTTONLN, &CCalculatorView::OnBnClickedButtonln)
-ON_BN_CLICKED(IDC_BUTTONTENPOW, &CCalculatorView::OnBnClickedButtontenpow)
-ON_BN_CLICKED(IDC_BUTTONCTAN, &CCalculatorView::OnBnClickedButtonctan)
-ON_BN_CLICKED(IDC_BUTTONTAN, &CCalculatorView::OnBnClickedButtontan)
-ON_COMMAND(ID_EDIT_COPY, &CCalculatorView::OnEditCopy)
-ON_COMMAND(ID_EDIT_PASTE, &CCalculatorView::OnEditPaste)
-ON_BN_CLICKED(IDC_BUTTONPI, &CCalculatorView::OnBnClickedButtonpi)
-ON_BN_CLICKED(IDC_BUTTONE, &CCalculatorView::OnBnClickedButtone)
-ON_COMMAND(ID_FILE_OPEN, &CCalculatorView::OnFileOpen)
-END_MESSAGE_MAP()
+	ON_BN_CLICKED(IDC_BUTTONLG, &CCalculatorView::OnBnClickedButtonlg)
+	ON_BN_CLICKED(IDC_BUTTONREVERS, &CCalculatorView::OnBnClickedButtonrevers)
+	ON_BN_CLICKED(IDC_BUTTONFACTORIAL, &CCalculatorView::OnBnClickedButtonfactorial)
+	ON_BN_CLICKED(IDC_BUTTONXLOGY, &CCalculatorView::OnBnClickedButtonxlogy)
+	ON_BN_CLICKED(IDC_BUTTONLN, &CCalculatorView::OnBnClickedButtonln)
+	ON_BN_CLICKED(IDC_BUTTONTENPOW, &CCalculatorView::OnBnClickedButtontenpow)
+	ON_BN_CLICKED(IDC_BUTTONCTAN, &CCalculatorView::OnBnClickedButtonctan)
+	ON_BN_CLICKED(IDC_BUTTONTAN, &CCalculatorView::OnBnClickedButtontan)
+	ON_COMMAND(ID_EDIT_COPY, &CCalculatorView::OnEditCopy)
+	ON_COMMAND(ID_EDIT_PASTE, &CCalculatorView::OnEditPaste)
+	ON_BN_CLICKED(IDC_BUTTONPI, &CCalculatorView::OnBnClickedButtonpi)
+	ON_BN_CLICKED(IDC_BUTTONE, &CCalculatorView::OnBnClickedButtone)
+	ON_COMMAND(ID_FILE_OPEN, &CCalculatorView::OnFileOpen)
+	END_MESSAGE_MAP()
 
 // CCalculatorView construction/destruction
 
@@ -144,26 +144,14 @@ CCalculatorDoc* CCalculatorView::GetDocument() const // non-debug version is inl
 
 
 int Prioritet(char);
-void RPN(ExpOp*);
 void Push(ExpOp*, ExpOp**);
-double CalculateRPN(ExpOp**);
 ExpOp* GoBackToOpenBr(ExpOp**);
 void InsertTo(ExpOp*, ExpOp**, ExpOp**);
 bool IsUnaryOp(char);
 
-ExpOp* Head = NULL;
-ExpOp* OutRPN = NULL;
-//MemoryItem* mi = new MemoryItem();
-int countBreckets = 0;
-bool isOpenBrStand = false;
-bool isCloseBrLast = false;
-bool CommaIsStands = false; //Отвечает за то, что точка в числе уже стоит. 
-bool isNumberEmpty = true; //Отвечает за то, что число ещё не было написано (используется старое значение)
-bool isOperatorStand = false; //Отвечает за то, что поставлен бинарный оператор (который в случае нужно заменить)
-bool isItCalculate = false;
-bool isCalculateError = false; //true - Если была недопустимое выражение в операции
 
-/*--------------------------КОНСТАНТЫ--------------------------*/
+
+/*-------------------------- КОНСТАНТЫ --------------------------*/
 
 void CCalculatorView::OnBnClickedButtonpi()
 {
@@ -181,7 +169,7 @@ void CCalculatorView::OnBnClickedButtone()
 	isNumberEmpty = true;
 }
 
-/*--------------------------ЧИСЛА--------------------------*/
+/*-------------------------- ЧИСЛА --------------------------*/
 
 void CCalculatorView::OnBnClickedButton1()
 {
@@ -293,7 +281,7 @@ void CCalculatorView::AddToNumField(LPCSTR num) {
 	isItCalculate = false;
 }
 
-/*--------------------------БИНАРНЫЕ ОПЕРАЦИИ--------------------------*/
+/*-------------------------- БИНАРНЫЕ ОПЕРАЦИИ --------------------------*/
 
 void CCalculatorView::OnBnClickedButtonplus()
 {
@@ -397,7 +385,7 @@ void CCalculatorView::OnBnClickedButtonclosingpar()
 	isCloseBrLast = true;
 }
 
-/*--------------------------УРАНЫЕ ОПЕРАЦИИ--------------------------*/
+/*-------------------------- УРАНЫЕ ОПЕРАЦИИ --------------------------*/
 /*  Легенда унарных операторов: 
 	* sqrt = s
 	* cos = c
@@ -541,7 +529,7 @@ void CCalculatorView::AddUnToExpression(char op) {
 	isNumberEmpty = true;
 }
 
-/*-------------------------------------РАБОТА СО СТЕКОМ И СПИСКОМ------------------------------------------*/
+/*------------------------------------- РАБОТА СО СТЕКОМ И СПИСКОМ ------------------------------------------*/
 
 
 void Push(ExpOp *el, ExpOp **HEAD) {
@@ -797,7 +785,7 @@ long factorial(int num) {
 }
 
 //Формирование обратной польской записи
-void RPN(ExpOp* HEAD) {
+void CCalculatorView::RPN(ExpOp* HEAD) {
 	
 	ExpOp* tp = NULL, *OpList = NULL, *UnOpList = NULL;
 	OutRPN = NULL;
