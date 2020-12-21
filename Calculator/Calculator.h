@@ -17,6 +17,8 @@
 class CCalculatorApp : public CWinApp
 {
 public:
+	void ResetFile();
+public:
 	CCalculatorApp() noexcept;
 
 

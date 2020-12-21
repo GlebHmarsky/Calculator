@@ -63,23 +63,23 @@ void CCalculatorDoc::Serialize(CArchive& ar)
 	if (ar.IsStoring())
 	{
 		// TODO: add storing code here
-		mi->Serialize(ar);
+		mi->Serialize(ar);		
 	}
 	else
 	{
 		// TODO: add loading code here
-		mi->Serialize(ar);
+		mi->Serialize(ar);		
 	}
 }
-
 
 void MemoryItem::Serialize(CArchive& ar)
 {
 	if (ar.IsStoring()) {
 		ar << info;
 	}
-	else
-		ar >> info;
+	else {
+		ar >> info;		
+	}
 }
 
 
