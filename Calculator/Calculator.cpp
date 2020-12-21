@@ -23,11 +23,16 @@ BEGIN_MESSAGE_MAP(CCalculatorApp, CWinApp)
 	ON_COMMAND(ID_APP_ABOUT, &CCalculatorApp::OnAppAbout)
 	// Standard file based document commands
 	ON_COMMAND(ID_FILE_NEW, &CWinApp::OnFileNew)
-	ON_COMMAND(ID_FILE_OPEN, &CWinApp::OnFileOpen)
+	ON_COMMAND(ID_FILE_OPEN, &CCalculatorApp::ReopenFile)
 END_MESSAGE_MAP()
 
 
 // CCalculatorApp construction
+
+void CCalculatorApp::ReopenFile()
+{
+	OnFileOpen();
+}
 
 CCalculatorApp::CCalculatorApp() noexcept
 {

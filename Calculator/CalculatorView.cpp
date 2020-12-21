@@ -77,6 +77,7 @@ ON_COMMAND(ID_EDIT_COPY, &CCalculatorView::OnEditCopy)
 ON_COMMAND(ID_EDIT_PASTE, &CCalculatorView::OnEditPaste)
 ON_BN_CLICKED(IDC_BUTTONPI, &CCalculatorView::OnBnClickedButtonpi)
 ON_BN_CLICKED(IDC_BUTTONE, &CCalculatorView::OnBnClickedButtone)
+ON_COMMAND(ID_FILE_OPEN, &CCalculatorView::OnFileOpen)
 END_MESSAGE_MAP()
 
 // CCalculatorView construction/destruction
@@ -1072,4 +1073,15 @@ void CCalculatorView::OnEditPaste()
 	m_NumField.SetReadOnly(false);
 	m_NumField.Paste();
 	m_NumField.SetReadOnly(true);
+}
+
+void CCalculatorView::OnFileOpen()
+{
+	// TODO: Add your command handler code here
+	GetDocument()->OnNewDocument();
+	theApp.ReopenFile();
+
+	m_TextM.ShowWindow(SW_SHOW);
+	OutToMemoryField();
+	m_MemoryField.ShowWindow(SW_SHOW);
 }
