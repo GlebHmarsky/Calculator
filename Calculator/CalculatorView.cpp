@@ -358,6 +358,7 @@ void CCalculatorView::OnBnClickedButtonopeningpar()
 	Push(new ExpOp('('), &Head);
 	OutToEdit(Head);
 	isOpenBrStand = true;
+	isOperatorStand = false;
 }
 
 void CCalculatorView::OnBnClickedButtonclosingpar()
@@ -384,6 +385,7 @@ void CCalculatorView::OnBnClickedButtonclosingpar()
 	}
 	OutToEdit(Head);
 	isCloseBrLast = true;
+	isOperatorStand = false;
 }
 
 /*-------------------------- УРАНЫЕ ОПЕРАЦИИ --------------------------*/
@@ -665,6 +667,9 @@ CString CCalculatorView::ConvertToString(char simbol) {
 	case 'h':
 		tmp = "tan";
 		break;
+	case '%':
+		tmp = " mod ";
+		break;
 	default:
 		tmp.Format(L"%c", simbol);
 		break;
@@ -759,10 +764,12 @@ void CCalculatorView::OnBnClickedButtonequal()
 {
 	// TODO: Add your control notification handler code here
 	if (isItCalculate) return;
-	CloseAllBreakets();
+	
 	/*Добавить последние число в стек и жить поживать*/
 	m_NumField.GetWindowText(str);
-	if (!isCloseBrLast) Push(new ExpOp(_tstof(str)), &Head);
+	if (!isCloseBrLast) 
+		Push(new ExpOp(_tstof(str)), &Head);
+	CloseAllBreakets();
 	OutToEdit(Head);
 
 	isNumberEmpty = true;
