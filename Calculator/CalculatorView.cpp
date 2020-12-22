@@ -881,6 +881,11 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 		return  abs(b);
 		break;
 	case 'e':
+		if (b < 0) {
+			MessageBox(L"Недопустимый ввод для логарифма");
+			isCalculateError = true;
+			return 1;
+		}
 		return  log(b);
 		break;
 	case 't':
