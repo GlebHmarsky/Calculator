@@ -160,6 +160,9 @@ void CCalculatorView::OnBnClickedButtonpi()
 	tmp.Format(L"%g", M_PI);
 	m_NumField.SetWindowTextW(tmp);
 	isNumberEmpty = true;
+	isOperatorStand = false;
+	isItCalculate = false;
+	CommaIsStands = false;
 }
 
 void CCalculatorView::OnBnClickedButtone()
@@ -168,6 +171,9 @@ void CCalculatorView::OnBnClickedButtone()
 	tmp.Format(L"%g", M_E);
 	m_NumField.SetWindowTextW(tmp);
 	isNumberEmpty = true;
+	isOperatorStand = false;
+	isItCalculate = false;
+	CommaIsStands = false;
 }
 
 /*-------------------------- ЧИСЛА --------------------------*/
