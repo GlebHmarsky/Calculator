@@ -355,7 +355,8 @@ void CCalculatorView::AddToExpression(char op)
 	isItCalculate = false;
 }
 
-/*  Скобки  */
+/* ---------------------------  СКОБКИ  ----------------------------- */
+
 void CCalculatorView::OnBnClickedButtonopeningpar()
 {
 	// TODO: Add your control notification handler code here
@@ -394,7 +395,7 @@ void CCalculatorView::OnBnClickedButtonclosingpar()
 	isOperatorStand = false;
 }
 
-/*-------------------------- УРАНЫЕ ОПЕРАЦИИ --------------------------*/
+/*-------------------------- УНАРНЫЕ ОПЕРАЦИИ --------------------------*/
 /*  Легенда унарных операторов: 
 	* sqrt = s
 	* cos = c
@@ -912,7 +913,7 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 		break;
 	case 'l':
 		if (b <= 0) {
-			MessageBox(L"Факториал от отрицательного числа невозможен");
+			MessageBox(L"Недопустимый ввод для логарифма");
 			isCalculateError = true;
 			return 1;
 		}
