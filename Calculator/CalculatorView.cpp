@@ -257,7 +257,9 @@ void CCalculatorView::OnBnClickedButton0()
 
 void CCalculatorView::OnBnClickedButtoncomma()
 {
-	// TODO: Add your control notification handler code here
+	if (isItCalculate)
+		OnBnClickedButtonclearall();
+
 	m_NumField.GetWindowText(str);
 	if (!CommaIsStands && isNumberEmpty) {
 		m_NumField.SetWindowTextW(L"0.");
@@ -727,7 +729,7 @@ void CCalculatorView::OnBnClickedButtonmr()
 {
 	// TODO: Add your control notification handler code here
 	CString tmp;
-	tmp.Format(L"%g", GetDocument()->mi->Mread());
+	tmp.Format(L"%f", GetDocument()->mi->Mread());
 	m_NumField.SetWindowTextW(tmp);
 	OutToMemoryField();
 	isNumberEmpty = true;
@@ -761,7 +763,7 @@ void CCalculatorView::OnBnClickedButtonmminus()
 
 void CCalculatorView::OutToMemoryField() {
 	CString tmp;
-	tmp.Format(L"%g", GetDocument()->mi->Mread());
+	tmp.Format(L"%f", GetDocument()->mi->Mread());
 	m_MemoryField.SetWindowTextW(tmp);
 }
 
@@ -865,6 +867,7 @@ void CCalculatorView::RPN(ExpOp* HEAD) {
 }
 
 double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
+	
 	ExpOp* el = Pull(hRPN);
 
 	//Если элемент число - то возвращаем его
@@ -874,6 +877,7 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 	//Иначе это опратор
 	double a, b; //Элементы выражения
 	b = CalculateRPN(hRPN);
+	if (isCalculateError) return 1;
 	// Если унарный оператор
 	switch (el->GetOp())
 	{
@@ -895,7 +899,7 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 		return  abs(b);
 		break;
 	case 'e':
-		if (b < 0) {
+		if (b <= 0) {
 			MessageBox(L"Недопустимый ввод для логарифма");
 			isCalculateError = true;
 			return 1;
@@ -909,6 +913,11 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 		return	tan(b);
 		break;
 	case 'g':
+		if (b == 0) {
+			MessageBox(L"Недопустимый ввод для котангенса");
+			isCalculateError = true;
+			return 1;
+		}
 		return  1/tan(b);
 		break;
 	case 'l':
@@ -946,6 +955,7 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 	}
 
 	a = CalculateRPN(hRPN);
+	if (isCalculateError) return 1;
 	switch (el->GetOp())
 	{
 	case '+':
