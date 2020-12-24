@@ -16,8 +16,6 @@
 
 class CCalculatorApp : public CWinApp
 {
-public: 
-	void ReopenFile();
 public:
 	CCalculatorApp() noexcept;
 

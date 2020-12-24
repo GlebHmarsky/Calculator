@@ -78,7 +78,6 @@ BEGIN_MESSAGE_MAP(CCalculatorView, CFormView)
 	ON_COMMAND(ID_EDIT_PASTE, &CCalculatorView::OnEditPaste)
 	ON_BN_CLICKED(IDC_BUTTONPI, &CCalculatorView::OnBnClickedButtonpi)
 	ON_BN_CLICKED(IDC_BUTTONE, &CCalculatorView::OnBnClickedButtone)
-	ON_COMMAND(ID_FILE_OPEN, &CCalculatorView::OnFileOpen)
 	END_MESSAGE_MAP()
 
 // CCalculatorView construction/destruction
@@ -116,7 +115,11 @@ void CCalculatorView::OnInitialUpdate()
 	CFormView::OnInitialUpdate();
 	GetParentFrame()->RecalcLayout();
 	ResizeParentToFit();
-
+	if (GetDocument()->mi->Mread() != 0) {
+		m_TextM.ShowWindow(SW_SHOW);
+		OutToMemoryField();
+		m_MemoryField.ShowWindow(SW_SHOW);
+	}
 }
 
 
@@ -741,9 +744,11 @@ void CCalculatorView::OnBnClickedButtonms()
 	// TODO: Add your control notification handler code here
 	m_NumField.GetWindowText(str);
 	GetDocument()->mi->Msave(_tstof(str));
-	m_TextM.ShowWindow(SW_SHOW);
-	OutToMemoryField();
-	m_MemoryField.ShowWindow(SW_SHOW);
+	if (GetDocument()->mi->Mread() != 0) {
+		m_TextM.ShowWindow(SW_SHOW);
+		OutToMemoryField();
+		m_MemoryField.ShowWindow(SW_SHOW);
+	}
 }
 
 void CCalculatorView::OnBnClickedButtonmplus()
@@ -1111,13 +1116,10 @@ void CCalculatorView::OnEditPaste()
 	m_NumField.SetReadOnly(true);
 }
 
-void CCalculatorView::OnFileOpen()
-{
-	// TODO: Add your command handler code here
-	GetDocument()->OnNewDocument();
-	theApp.ReopenFile();
-
-	m_TextM.ShowWindow(SW_SHOW);
-	OutToMemoryField();
-	m_MemoryField.ShowWindow(SW_SHOW);
-}
+//void CCalculatorView::OnFileOpen()
+//{
+//	// TODO: Add your command handler code here
+//	GetDocument()->OnNewDocument();
+//	theApp.ReopenFile();
+//
+//}

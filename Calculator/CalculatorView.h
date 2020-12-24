@@ -119,7 +119,6 @@ public:
 	afx_msg void OnEditPaste();
 	afx_msg void OnBnClickedButtonpi();
 	afx_msg void OnBnClickedButtone();
-	afx_msg void OnFileOpen();
 };
 
 #ifndef _DEBUG  // debug version in CalculatorView.cpp
