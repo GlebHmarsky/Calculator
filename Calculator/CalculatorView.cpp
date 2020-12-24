@@ -395,6 +395,7 @@ void CCalculatorView::OnBnClickedButtonclosingpar()
 	OutToEdit(Head);
 	isCloseBrLast = true;
 	isOperatorStand = false;
+	isNumberEmpty = true;
 }
 
 /*-------------------------- УНАРНЫЕ ОПЕРАЦИИ --------------------------*/
@@ -773,12 +774,12 @@ void CCalculatorView::OnBnClickedButtonequal()
 {
 	// TODO: Add your control notification handler code here
 	if (isItCalculate) return;
-	
+	CloseAllBreakets();
 	/*Добавить последние число в стек и жить поживать*/
 	m_NumField.GetWindowText(str);
 	if (!isCloseBrLast) 
 		Push(new ExpOp(_tstof(str)), &Head);
-	CloseAllBreakets();
+	
 	OutToEdit(Head);
 
 	isNumberEmpty = true;
@@ -869,7 +870,7 @@ void CCalculatorView::RPN(ExpOp* HEAD) {
 double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 	
 	ExpOp* el = Pull(hRPN);
-
+	double tmpnum = 0;
 	//Если элемент число - то возвращаем его
 	if (el->isNum) {
 		return el->GetNum();
@@ -976,7 +977,15 @@ double CCalculatorView::CalculateRPN(ExpOp** hRPN) {
 		return a / b;
 		break;
 	case '^':
-		return pow(a,b);
+		 // Для того чтобы получить дробную часть числа.
+		if (a < 0 && (modf(b, &tmpnum) != 0 ) ) {
+			MessageBox(L"Возведение отрицательного числа в нецелую степень невозможно");
+			isCalculateError = true;
+			return 1;
+		}
+		else {
+			return pow(a, b);
+		}		
 		break;
 	case '%':
 		if (b == 0) {
