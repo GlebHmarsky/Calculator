@@ -547,7 +547,6 @@ void CCalculatorView::AddUnToExpression(char op) {
 
 /*------------------------------------- РАБОТА СО СТЕКОМ И СПИСКОМ ------------------------------------------*/
 
-
 void Push(ExpOp *el, ExpOp **HEAD) {
 	//if Head is empty
 	if (!*HEAD) {
@@ -1115,11 +1114,3 @@ void CCalculatorView::OnEditPaste()
 	
 	m_NumField.SetReadOnly(true);
 }
-
-//void CCalculatorView::OnFileOpen()
-//{
-//	// TODO: Add your command handler code here
-//	GetDocument()->OnNewDocument();
-//	theApp.ReopenFile();
-//
-//}
